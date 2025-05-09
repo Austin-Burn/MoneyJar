@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Money Jar Bruno Tests",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
