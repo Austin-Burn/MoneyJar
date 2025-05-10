@@ -1,1 +1,43 @@
 -- Your SQL goes here
+
+CREATE TABLE Users (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(255),
+
+);
+
+CREATE TABLE UserPaymentMethods (
+    PRIMARY KEY(user_id, payment_method),
+    user_id VARCHAR(255) NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
+    payment_method VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Events (
+    id VARCHAR(255) PRIMARY KEY,
+    owner_id VARCHAR(255) NOT NULL REFERENCES Users(id),
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    date VARCHAR(255) NOT NULL,
+    reoccuring BOOLEAN NOT NULL,
+    reoccuring_interval VARCHAR(255) NOT NULL,
+);
+
+--keeps track of who is in what event User and Event purposes work directly inversely
+CREATE TABLE WhoInWhat (
+    PRIMARY KEY(user_id, event_id),
+    user_id VARCHAR(255) NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
+    event_id VARCHAR(255) NOT NULL REFERENCES Events(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    from_user_id VARCHAR(255) NOT NULL REFERENCES Users(id)
+    to_user_id VARCHAR(255) NOT NULL REFERENCES Users(id),
+    event_id VARCHAR(255) NOT NULL REFERENCES Events(id),
+    amount INTEGER NOT NULL,
+    date VARCHAR(255) NOT NULL
+);
+
