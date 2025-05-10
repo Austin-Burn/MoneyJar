@@ -2,7 +2,7 @@
 
 diesel::table! {
     Events (id) {
-        id -> Nullable<Text>,
+        id -> Text,
         owner_id -> Text,
         name -> Text,
         description -> Text,
