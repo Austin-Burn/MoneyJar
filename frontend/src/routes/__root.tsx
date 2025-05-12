@@ -1,10 +1,4 @@
-import {
-	mdiAccount,
-	mdiAccountGroup,
-	mdiCalendar,
-	mdiCircle,
-	mdiHome,
-} from "@mdi/js";
+import { mdiAccount, mdiAccountGroup, mdiCalendar, mdiHome } from "@mdi/js";
 import Icon from "@mdi/react";
 import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
 import AccountDefaultSvg from "../images/account-default.svg?react";

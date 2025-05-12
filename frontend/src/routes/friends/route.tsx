@@ -1,3 +1,4 @@
+import { PageContainer } from "@/components/PageContainer.tsx";
 import {
 	mdiAccountPlus,
 	mdiCashFast,
@@ -48,11 +49,7 @@ const Users = [
 
 function RouteComponent() {
 	return (
-		<div
-			className={
-				"flex h-full w-full flex-col gap-8 rounded-md border border-gray-200 bg-gray-50 p-4 shadow-lg"
-			}
-		>
+		<PageContainer>
 			<div className={"flex flex-row items-center justify-between"}>
 				<h1 className={"text-4xl"}>Friends</h1>
 				<div className={"flex flex-row items-center gap-4"}>
@@ -91,6 +88,6 @@ function RouteComponent() {
 					</div>
 				))}
 			</div>
-		</div>
+		</PageContainer>
 	);
 }

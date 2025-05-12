@@ -1,3 +1,4 @@
+import { PageContainer } from "@/components/PageContainer.tsx";
 import { mdiImageEdit, mdiQrcode, mdiTrashCan } from "@mdi/js";
 import Icon from "@mdi/react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -15,12 +16,8 @@ const User = {
 
 function RouteComponent() {
 	return (
-		<div
-			className={
-				"flex h-full w-full flex-col gap-4 rounded-md border border-gray-200 bg-gray-50 p-4 shadow-lg"
-			}
-		>
-			<div className={"flex flex-row items-center justify-between p-4"}>
+		<PageContainer>
+			<div className={"flex flex-row items-center justify-between"}>
 				<div className={"flex flex-row items-center gap-8"}>
 					<div
 						className={
@@ -45,7 +42,7 @@ function RouteComponent() {
 					<Icon className={"text-gray-700"} path={mdiQrcode} size={1.0} />
 				</div>
 			</div>
-			<div className={"flex flex-col gap-4 px-4 "}>
+			<div className={"flex flex-col gap-4"}>
 				<div>
 					<h2 className={"font-semibold text-2xl"}>Email</h2>
 					<p className={"text-lg"}>{User.email}</p>
@@ -66,6 +63,6 @@ function RouteComponent() {
 					</button>
 				</div>
 			</div>
-		</div>
+		</PageContainer>
 	);
 }
