@@ -3,6 +3,7 @@ use super::users_models::*;
 use diesel::prelude::*;
 use diesel::result::*;
 use uuid::Uuid;
+
 use crate::establish_connection;
     
 
@@ -11,10 +12,9 @@ pub fn create_user(name: String, email: String) -> Result<String, Error> {
     let user = NewUser::new(id, name, email);
     let conn = &mut establish_connection();
 
-    let email_exists = Users::table.filter(Users::email.eq(email))
-        .first::<String, NotFoundError>(conn)
-        .optional()
-        .map_err(|_| Error::NotFound)?;
+    let email_exists = diesel::select(exists(users::table.filter(users::email.eq(email))))
+    .get_result::<bool>(conn)
+    .map_err(|_| Error::NotFound)?;
 
     if email_exists.is_some() {
         return Err(Error::NotFound)?;
@@ -40,8 +40,8 @@ pub fn update_phone(id: String, phone: String) -> Result<(), Error> {
 
 pub fn update_email(id: String, email: String) -> Result<(), Error> {
     let conn = &mut establish_connection();
-    let user = Users::table.filter(Users::id.eq(id))
-        .update(Users::email.eq(email))
+    let user = diesel::update(Users::table.filter(Users::id.eq(id)))
+        .set(Users::email.eq(email))
         .execute(conn)
         .map_err(|_| Error::NotFound)?;
 

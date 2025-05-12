@@ -6,7 +6,7 @@ use crate::schema::Users;
 
 //template for structs
 
-struct Users {
+struct TemplateUsers {
     id: String,
     name: String,
     email: String,
@@ -37,32 +37,36 @@ impl NewUser {
 #[derive(AsChangeset)]
 #[diesel(table_name = Users)]
 pub struct UpdateName {
-    email: String,
+    name: String,
 }
 
 impl UpdateName {
+    pub fn new(name: String) -> Self {
+        Self { name }
+    }
+}
+
+#[derive(AsChangeset)]
+#[diesel(table_name = Users)]
+pub struct UpdateEmail {
+    email: String,
+}
+
+impl UpdateEmail {
     pub fn new(email: String) -> Self {
         Self { email }
     }
 }
 
-pub struct UpdateEmail {
-    name: String,
-}
-
-impl UpdateEmail {
-    pub fn new(name: String) -> Self {
-        Self { name }
-    }
-}
-
+#[derive(AsChangeset)]
+#[diesel(table_name = Users)]
 pub struct UpdatePhone {
-    name: String,
+    phone: String,
 }
 
 impl UpdatePhone {
-    pub fn new(name: String) -> Self {
-        Self { name }
+    pub fn new(phone: String) -> Self {
+        Self { phone }
     }
 }
 
@@ -72,42 +76,38 @@ impl UpdatePhone {
 #[derive(Queryable)]
 #[diesel(table_name = Users)]
 pub struct GetName {
-    pub id: String,
     pub name: String,
 }
 
 impl GetName {
-    pub fn new(id: String) -> Self {
-        Self { id }
+    pub fn new(name: String) -> Self {
+        Self { name }
     }
 }
 
 #[derive(Queryable)]
 #[diesel(table_name = Users)]
 pub struct GetEmail {
-    pub id: String,
     pub email: String,
 }
 
 impl GetEmail {
-    pub fn new(id: String) -> Self {
-        Self { id }
+    pub fn new(email: String) -> Self {
+        Self { email }
     }
 }
 
 #[derive(Queryable)]
 #[diesel(table_name = Users)]
 pub struct GetPhone {
-    pub id: String,
     pub phone: String,
 }   
 
 impl GetPhone {
-    pub fn new(id: String) -> Self {
-        Self { id }
+    pub fn new(phone: String) -> Self {
+        Self { phone }
     }
 }
-
 
 
 
