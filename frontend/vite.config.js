@@ -4,6 +4,7 @@ import { defineConfig } from "vite";
 
 import { resolve } from "node:path";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import vitePluginSvgr from "vite-plugin-svgr";
 
 const ReactCompilerConfig = {
 
@@ -19,6 +20,7 @@ export default defineConfig({
 			}
 		}),
 		tailwindcss(),
+		vitePluginSvgr()
 	],
 	test: {
 		globals: true,
