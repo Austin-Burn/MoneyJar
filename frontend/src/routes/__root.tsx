@@ -7,6 +7,7 @@ import {
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
+import AccountDefaultSvg from "../images/account-default.svg?react";
 
 export const Route = createRootRoute({
 	component: () => (
@@ -19,7 +20,7 @@ export const Route = createRootRoute({
 						<Link
 							to={"/"}
 							className={
-								"h-fit w-fit cursor-pointer rounded-full p-3 hover:bg-gray-200 active:bg-gray-400"
+								"flex h-12 w-12 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 active:bg-gray-400"
 							}
 						>
 							<Icon className={"text-gray-700"} path={mdiHome} size={1.0} />
@@ -29,7 +30,7 @@ export const Route = createRootRoute({
 						<Link
 							to={"/events"}
 							className={
-								"h-fit w-fit cursor-pointer rounded-full p-3 hover:bg-gray-200 active:bg-gray-400"
+								"flex h-12 w-12 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 active:bg-gray-400"
 							}
 						>
 							<Icon className={"text-gray-700"} path={mdiCalendar} size={1.0} />
@@ -39,7 +40,7 @@ export const Route = createRootRoute({
 						<Link
 							to={"/friends"}
 							className={
-								"h-fit w-fit cursor-pointer rounded-full p-3 hover:bg-gray-200 active:bg-gray-400"
+								"flex h-12 w-12 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 active:bg-gray-400"
 							}
 						>
 							<Icon className={"text-gray-700"} path={mdiAccount} size={1.0} />
@@ -49,7 +50,7 @@ export const Route = createRootRoute({
 						<Link
 							to={"/groups"}
 							className={
-								"h-fit w-fit cursor-pointer rounded-full p-3 hover:bg-gray-200 active:bg-gray-400"
+								"flex h-12 w-12 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 active:bg-gray-400"
 							}
 						>
 							<Icon
@@ -63,10 +64,12 @@ export const Route = createRootRoute({
 						<Link
 							to={"/account"}
 							className={
-								"h-fit w-fit cursor-pointer rounded-full p-3 hover:bg-gray-200 active:bg-gray-400"
+								"flex h-12 w-12 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 active:bg-gray-400"
 							}
 						>
-							<Icon className={"text-gray-700"} path={mdiCircle} size={1.0} />
+							<div className={"h-10 w-10"}>
+								<AccountDefaultSvg />
+							</div>
 						</Link>
 					</nav>
 				</div>
