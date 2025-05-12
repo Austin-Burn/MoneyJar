@@ -1,10 +1,9 @@
-use schema::Users;
+use crate::schema::Users;
 use super::users_models::*;
-use diesel::sqlite::SqliteConnection;
 use diesel::prelude::*;
-use diesel::result::Error;
-
-
+use diesel::result::*;
+use uuid::Uuid;
+use crate::establish_connection;
     
 
 pub fn create_user(name: String, email: String) -> Result<String, Error> {
@@ -13,29 +12,30 @@ pub fn create_user(name: String, email: String) -> Result<String, Error> {
     let conn = &mut establish_connection();
 
     let email_exists = Users::table.filter(Users::email.eq(email))
-        .select(Users::id)
-        .first::<String>(conn)
+        .first::<String, NotFoundError>(conn)
         .optional()
         .map_err(|_| Error::NotFound)?;
 
     if email_exists.is_some() {
-        return Err(Error::InsertError);
+        return Err(Error::NotFound)?;
     }
 
     diesel::insert_into(Users::table)
         .values(user)
         .execute(conn)
-        .map_err(|_| Error::InsertError)?;
+        .map_err(|_| Error::NotFound("Email already exists".into()))?;
 
-    Ok(id)
+    Ok(i)
 }
 
 pub fn update_phone(id: String, phone: String) -> Result<(), Error> {
     let conn = &mut establish_connection();
-    let user = Users::table.filter(Users::id.eq(id))
-        .update(Users::phone.eq(phone))
+    let user = diesel::update(Users::table.filter(Users::id.eq(id)))
+        .set(Users::phone.eq(phone))
         .execute(conn)
-        .map_err(|_| Error::UpdateError)?;
+        .map_err(|_| Error::NotFound)?;
+
+    Ok(())
 }
 
 pub fn update_email(id: String, email: String) -> Result<(), Error> {
@@ -43,7 +43,9 @@ pub fn update_email(id: String, email: String) -> Result<(), Error> {
     let user = Users::table.filter(Users::id.eq(id))
         .update(Users::email.eq(email))
         .execute(conn)
-        .map_err(|_| Error::UpdateError)?;
+        .map_err(|_| Error::NotFound)?;
+
+    Ok(())
 }
 
 pub fn update_name(id: String, name: String) -> Result<(), Error> {
@@ -51,17 +53,19 @@ pub fn update_name(id: String, name: String) -> Result<(), Error> {
     let user = Users::table.filter(Users::id.eq(id))
         .update(Users::name.eq(name))
         .execute(conn)
-        .map_err(|_| Error::UpdateError)?;
+        .map_err(|_| Error::NotFound)?;
+
+    Ok(())
 }
 
 pub fn get_email(id: String) -> Result<String, Error> {
     let conn = &mut establish_connection();
-    let email_exists = Users::table.filter(Users::id.eq(id))
+    let email = Users::table.filter(Users::id.eq(id))
         .select(Users::email)
         .first::<String>(conn)
         .map_err(|_| Error::NotFound)?;
 
-    Ok(email_exists)
+    Ok(email)
 }
 
 pub fn get_name(id: String) -> Result<String, Error> {
@@ -81,7 +85,7 @@ pub fn get_phone(id: String) -> Result<String, Error> {
         .first::<String>(conn)
         .map_err(|_| Error::NotFound)?;
 
-    Ok(phone_exists)?;
+    Ok(phone_exists);
 }
 
 pub fn get_id(id: String) -> Result<String, Error> {
