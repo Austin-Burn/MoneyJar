@@ -14,7 +14,7 @@ diesel::table! {
 
 diesel::table! {
     Transactions (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         from_user_id -> Text,
         to_user_id -> Text,
         event_id -> Text,
@@ -32,7 +32,7 @@ diesel::table! {
 
 diesel::table! {
     Users (id) {
-        id -> Nullable<Text>,
+        id -> Text,
         name -> Text,
         email -> Text,
         phone -> Nullable<Text>,

@@ -19,14 +19,14 @@ async fn main() {
         .route("/", get(root))
         .route("/api/hello", post(hello_handler))
         //user routes          backend api call uses camel case convention while core calls use snake_case convention
-        .route("/api/CreateUser", post(CreateUser)) //takes name, email returns id
-        .route("/api/UpdateName", post(UpdateName)) //takes id, name returns message
-        .route("/api/UpdateEmail", post(UpdateEmail)) //takes id, email returns message
-        .route("/api/UpdatePhone", post(UpdatePhone)) //takes id, phone returns message
-        .route("/api/GetName", post(GetName)) //takes id returns name
-        .route("/api/GetEmail", post(GetEmail)) //takes id returns email
-        .route("/api/GetPhone", post(GetPhone)) //takes id returns phone
-        ;
+        .route("/api/CreateUser", post(post_create_user)); //takes name, email returns id
+        //.route("/api/UpdateName", post(UpdateName)) //takes id, name returns message
+        //.route("/api/UpdateEmail", post(UpdateEmail)) //takes id, email returns message
+        //.route("/api/UpdatePhone", post(UpdatePhone)) //takes id, phone returns message
+        //.route("/api/GetName", post(GetName)) //takes id returns name
+        //.route("/api/GetEmail", post(GetEmail)) //takes id returns email
+        //.route("/api/GetPhone", post(GetPhone)); //takes id returns phone
+
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:2000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
@@ -54,9 +54,13 @@ struct HelloResponse {
 
 //user routes
 
-async fn CreateUser(Json(payload): Json<CreateUserRequest>) -> (StatusCode, Json<CreateUserResponse>) {
+async fn post_create_user(Json(payload): Json<CreateUserRequest>) -> (StatusCode, Json<CreateUserResponse>) {
     let response = create_user(payload.name, payload.email);
-    (StatusCode::OK, Json(CreateUserResponse { message: response }))
+
+    match response {
+        Err(e) => (StatusCode::NOT_FOUND, Json(CreateUserResponse { message: e.to_string() })),
+        Ok(id) => (StatusCode::OK, Json(CreateUserResponse { message: id })),
+    }
 }
 
 #[derive(Deserialize)]
@@ -69,138 +73,104 @@ struct CreateUserRequest {
 struct CreateUserResponse {
     message: String,
 }
-
-async fn UpdateName(Json(payload): Json<UpdateNameRequest>) -> (StatusCode, Json<UpdateNameResponse>) {
-    let response = update_name(payload.id, payload.name);
-    (StatusCode::OK, Json(UpdateNameResponse { message: response }))
-}
-
-#[derive(Deserialize)]
-struct UpdateNameRequest {
-    id: String,
-    name: String,
-}
-
-#[derive(Serialize)]
-struct UpdateNameResponse {
-    message: String,
-}
-
-async fn UpdateEmail(Json(payload): Json<UpdateEmailRequest>) -> (StatusCode, Json<UpdateEmailResponse>) {
-    let response = update_email(payload.id, payload.email);
-    (StatusCode::OK, Json(UpdateEmailResponse { message: response }))
-}   
-
-#[derive(Deserialize)]
-struct UpdateEmailRequest {
-    id: String,
-    email: String,
-}
-
-#[derive(Serialize)]
-struct UpdateEmailResponse {
-    message: String,
-}
-
-async fn UpdatePhone(Json(payload): Json<UpdatePhoneRequest>) -> (StatusCode, Json<UpdatePhoneResponse>) {
-    let response = update_phone(payload.id, payload.phone);
-    (StatusCode::OK, Json(UpdatePhoneResponse { message: response }))
-}
-
-#[derive(Deserialize)]
-struct UpdatePhoneRequest {
-    id: String,
-    phone: String,
-}
-
-#[derive(Serialize)]
-struct UpdatePhoneResponse {
-    message: String,
-}
-
-async fn GetName(Json(payload): Json<GetNameRequest>) -> (StatusCode, Json<GetNameResponse>) {
-    let response = get_name(payload.id);
-    (StatusCode::OK, Json(GetNameResponse { name: response }))
-}
-
-#[derive(Deserialize)]
-struct GetNameRequest {
-    id: String,
-}
-
-#[derive(Serialize)]
-struct GetNameResponse {
-    name: String,
-}
-
-async fn GetEmail(Json(payload): Json<GetEmailRequest>) -> (StatusCode, Json<GetEmailResponse>) {
-    let response = get_email(payload.id);
-    (StatusCode::OK, Json(GetEmailResponse { email: response }))
-}
-
-#[derive(Deserialize)]
-struct GetEmailRequest {
-    id: String,
-}
-
-#[derive(Serialize)]
-struct GetEmailResponse {
-    email: String,
-}
-
-async fn GetPhone(Json(payload): Json<GetPhoneRequest>) -> (StatusCode, Json<GetPhoneResponse>) {
-    let response = get_phone(payload.id);
-    (StatusCode::OK, Json(GetPhoneResponse { phone: response }))
-}
-
-#[derive(Deserialize)]
-struct GetPhoneRequest {
-    id: String,
-}
-
-#[derive(Serialize)]
-struct GetPhoneResponse {
-    phone: String,
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//
+// async fn UpdateName(Json(payload): Json<UpdateNameRequest>) -> (StatusCode, Json<UpdateNameResponse>) {
+//     let response = update_name(payload.id, payload.name);
+//     (StatusCode::OK, Json(UpdateNameResponse { message: response }))
+// }
+//
+// #[derive(Deserialize)]
+// struct UpdateNameRequest {
+//     id: String,
+//     name: String,
+// }
+//
+// #[derive(Serialize)]
+// struct UpdateNameResponse {
+//     message: String,
+// }
+//
+// async fn UpdateEmail(Json(payload): Json<UpdateEmailRequest>) -> (StatusCode, Json<UpdateEmailResponse>) {
+//     let response = update_email(payload.id, payload.email);
+//     (StatusCode::OK, Json(UpdateEmailResponse { message: response }))
+// }
+//
+// #[derive(Deserialize)]
+// struct UpdateEmailRequest {
+//     id: String,
+//     email: String,
+// }
+//
+// #[derive(Serialize)]
+// struct UpdateEmailResponse {
+//     message: String,
+// }
+//
+// async fn UpdatePhone(Json(payload): Json<UpdatePhoneRequest>) -> (StatusCode, Json<UpdatePhoneResponse>) {
+//     let response = update_phone(payload.id, payload.phone);
+//     (StatusCode::OK, Json(UpdatePhoneResponse { message: response }))
+// }
+//
+// #[derive(Deserialize)]
+// struct UpdatePhoneRequest {
+//     id: String,
+//     phone: String,
+// }
+//
+// #[derive(Serialize)]
+// struct UpdatePhoneResponse {
+//     message: String,
+// }
+//
+// async fn GetName(Json(payload): Json<GetNameRequest>) -> (StatusCode, Json<GetNameResponse>) {
+//     let response = get_name(payload.id);
+//     (StatusCode::OK, Json(GetNameResponse { name: response }))
+// }
+//
+// #[derive(Deserialize)]
+// struct GetNameRequest {
+//     id: String,
+// }
+//
+// #[derive(Serialize)]
+// struct GetNameResponse {
+//     name: String,
+// }
+//
+// async fn GetEmail(Json(payload): Json<GetEmailRequest>) -> (StatusCode, Json<GetEmailResponse>) {
+//     let response = get_email(payload.id);
+//     (StatusCode::OK, Json(GetEmailResponse { email: response }))
+// }
+//
+// #[derive(Deserialize)]
+// struct GetEmailRequest {
+//     id: String,
+// }
+//
+// #[derive(Serialize)]
+// struct GetEmailResponse {
+//     email: String,
+// }
+//
+// async fn GetPhone(Json(payload): Json<GetPhoneRequest>) -> (StatusCode, Json<GetPhoneResponse>) {
+//     let response = get_phone(payload.id);
+//
+//     match response {
+//         Err => return (StatusCode::NOT_FOUND, Json(GetPhoneResponse { phone: String::from("") })),
+//         Ok(Some()) => return (StatusCode::NOT_FOUND, Json(GetPhoneResponse { phone: String::from("") })),
+//     }
+//
+//     (StatusCode::OK, Json(GetPhoneResponse { phone: response }))
+// }
+//
+// #[derive(Deserialize)]
+// struct GetPhoneRequest {
+//     id: String,
+// }
+//
+// #[derive(Serialize)]
+// struct GetPhoneResponse {
+//     phone: String,
+// }
 
 

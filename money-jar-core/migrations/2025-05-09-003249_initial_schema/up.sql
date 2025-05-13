@@ -1,7 +1,7 @@
 -- Your SQL goes here
 
 CREATE TABLE Users (
-    id VARCHAR(255) PRIMARY KEY,
+    id VARCHAR(255) PRIMARY KEY NOT NULL,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     phone VARCHAR(255)
@@ -14,7 +14,7 @@ CREATE TABLE UserPaymentMethods (
 );
 
 CREATE TABLE Events (
-    id VARCHAR(255) PRIMARY KEY,
+    id VARCHAR(255) PRIMARY KEY NOT NULL,
     owner_id VARCHAR(255) NOT NULL REFERENCES Users(id),
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE WhoInWhat (
 
 
 CREATE TABLE Transactions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     from_user_id VARCHAR(255) NOT NULL REFERENCES Users(id),
     to_user_id VARCHAR(255) NOT NULL REFERENCES Users(id),
     event_id VARCHAR(255) NOT NULL REFERENCES Events(id),
