@@ -8,9 +8,9 @@ use crate::{establish_connection};
 use crate::Users::dsl::Users;
 use crate::Users::*;
 
-pub fn create_user(new_name: String, new_email: String) -> Result<String, Error> {
+pub fn create_user(new_name: String, new_email: String, new_password: String) -> Result<String, Error> {
     let new_id = Uuid::new_v4().to_string();
-    let user = NewUser::new(new_id.clone(), new_name, new_email.clone());
+    let user = NewUser::new(new_id.clone(), new_name, new_email.clone(), new_password.clone());
     let conn = &mut establish_connection();
 
     let email_exists = select(exists(Users.filter(email.eq(new_email))))
@@ -60,6 +60,18 @@ pub fn update_name(get_id: String, update_name: String) -> Result<(), Error> {
     Ok(())
 }
 
+pub fn update_password(get_id: String, update_password: String) -> Result<(), Error> {
+    let conn = &mut establish_connection();
+    let update_password = UpdatePassword::new(update_password);
+    update(Users)
+        .filter(id.eq(get_id))
+        .set(update_password)
+        .execute(conn)
+        .map_err(|_| Error::NotFound)?;
+
+    Ok(())
+}
+
 pub fn get_email(get_id: String) -> Result<String, Error> {
     let conn = &mut establish_connection();
     let result = Users
@@ -89,17 +101,32 @@ pub fn get_phone(get_id: String) -> Result<Option<String>, Error> {
         .select(phone)
         .first::<Option<String>>(conn)
         .map_err(|_| Error::NotFound)?;
-
     Ok(phone_exists)
 }
 
-pub fn get_id(get_id: String) -> Result<String, Error> {
+
+//named get id as this doesnt seem to be fully enough to be called login YET
+pub fn get_id(get_email: String, get_password: String) -> Result<String, Error> {
     let conn = &mut establish_connection();
-    let id_exists = Users
-        .filter(id.eq(get_id))
+    let result = Users
+        .filter(email.eq(get_email))
+        .filter(password.eq(get_password))
         .select(id)
         .first::<String>(conn)
         .map_err(|_| Error::NotFound)?;
 
-    Ok(id_exists)
+    Ok(result)
 }
+
+
+//delete user
+pub fn delete_user(get_id: String) -> Result<(), Error> {
+    let conn = &mut establish_connection();
+    delete(Users.filter(id.eq(get_id))).execute(conn).map_err(|_| Error::NotFound)?;
+    Ok(())
+}
+
+
+
+
+

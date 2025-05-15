@@ -17,10 +17,11 @@ CREATE TABLE Events (
     id VARCHAR(255) PRIMARY KEY NOT NULL,
     owner_id VARCHAR(255) NOT NULL REFERENCES Users(id),
     name VARCHAR(255) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    date VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    date VARCHAR(255),
     reoccuring BOOLEAN NOT NULL,
-    reoccuring_interval VARCHAR(255) NOT NULL
+    reoccuring_interval VARCHAR(255),
+    final_date VARCHAR(255)
 );
 
 --keeps track of who is in what event User and Event purposes work directly inversely

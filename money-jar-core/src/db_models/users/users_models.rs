@@ -24,11 +24,12 @@ pub struct NewUser {
     id: String,
     name: String,
     email: String,
+    password: String,
 }
 
 impl NewUser {
-    pub fn new(id: String, name: String, email: String) -> Self {
-        Self { id, name, email }
+    pub fn new(id: String, name: String, email: String, password: String) -> Self {
+        Self { id, name, email, password }
     }
 }
 
@@ -70,7 +71,20 @@ impl UpdatePhone {
     }
 }
 
-//query models 
+#[derive(AsChangeset)]
+#[diesel(table_name = Users)]
+pub struct UpdatePassword {
+    password: String,
+}
+
+impl UpdatePassword {
+    pub fn new(password: String) -> Self {
+        Self { password }
+    }
+}
+
+
+
 
 //get by id
 #[derive(Queryable)]
