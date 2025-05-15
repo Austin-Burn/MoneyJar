@@ -6,6 +6,9 @@ use serde::{Deserialize, Serialize};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use money_jar_core::db_models::users::users_crud::*;
 use money_jar_core::db_models::friends::friends_crud::*;
+use money_jar_core::db_models::events::events_crud::*;
+use money_jar_core::db_models::events::events_models::GetEvent;
+
 
 #[tokio::main]
 async fn main() {
@@ -31,7 +34,12 @@ async fn main() {
         //friend routes
         .route("/api/CreateFriend", post(post_create_friend)) //takes id, friend_id returns message
         .route("/api/GetFriends", post(post_get_friends)) //takes id returns friends
-        .route("/api/DeleteFriend", post(post_delete_friend)); //takes id, friend_id returns message
+        .route("/api/DeleteFriend", post(post_delete_friend)) //takes id, friend_id returns message
+        //event routes
+        .route("/api/CreateEvent", post(post_create_event)) //takes id, owner_id, name, reoccuring returns message
+        .route("/api/GetEvent", post(post_get_event)) //takes id returns event
+        .route("/api/UpdateEvent", post(post_event_update_name)) //takes id, name returns message
+        .route("/api/DeleteEvent", post(post_delete_event)); //takes id returns message
 
 
 
@@ -276,5 +284,185 @@ struct DeleteFriendRequest {
     id: String,
     friend_id: String,
 }
+
+
+//event routes
+
+async fn post_create_event(Json(payload): Json<CreateEventRequest>) -> StatusCode {
+    let response = create_event(payload.owner_id, payload.name, payload.reoccuring);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct CreateEventRequest {
+    owner_id: String,
+    name: String,
+    reoccuring: bool,
+}
+
+
+async fn post_update_owner_id(Json(payload): Json<UpdateOwnerIdRequest>) -> StatusCode {
+    let response = event_update_owner_id(payload.id, payload.owner_id);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct UpdateOwnerIdRequest {
+    id: String,
+    owner_id: String,
+}
+
+async fn post_event_update_name(Json(payload): Json<EventUpdateNameRequest>) -> StatusCode {
+    let response = event_update_name(payload.id, payload.name);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct EventUpdateNameRequest {
+    id: String,
+    name: String,
+}
+
+async fn post_update_description(Json(payload): Json<UpdateDescriptionRequest>) -> StatusCode {
+    let response = update_description(payload.id, payload.description);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct UpdateDescriptionRequest {
+    id: String,
+    description: String,
+}
+
+async fn post_update_date(Json(payload): Json<UpdateDateRequest>) -> StatusCode {
+    let response = update_date(payload.id, payload.date);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct UpdateDateRequest {
+    id: String,
+    date: String,
+}
+
+async fn post_update_reoccuring(Json(payload): Json<UpdateReoccuringRequest>) -> StatusCode {
+    let response = update_reoccuring(payload.id, payload.reoccuring);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct UpdateReoccuringRequest {
+    id: String,
+    reoccuring: bool,
+}
+
+async fn post_update_reoccuring_interval(Json(payload): Json<UpdateReoccuringIntervalRequest>) -> StatusCode {
+    let response = update_reoccuring_interval(payload.id, payload.reoccuring_interval);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct UpdateReoccuringIntervalRequest {
+    id: String,
+    reoccuring_interval: String,
+}
+
+async fn post_update_final_date(Json(payload): Json<UpdateFinalDateRequest>) -> StatusCode {
+    let response = update_final_date(payload.id, payload.final_date);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct UpdateFinalDateRequest {
+    id: String,
+    final_date: String,
+}
+
+async fn post_delete_event(Json(payload): Json<DeleteEventRequest>) -> StatusCode {
+    let response = delete_event(payload.id);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct DeleteEventRequest {
+    id: String,
+}
+
+async fn post_get_event(Json(payload): Json<GetEventRequest>) -> (StatusCode, Json<GetEventResponse>) {
+    let response = get_event(payload.id);
+
+    match response {
+        Err(_) => (StatusCode::NOT_FOUND, Json(GetEventResponse { event: GetEvent { id: "".to_string(), owner_id: "".to_string(), name: "".to_string(), description: Some("".to_string()), event_date: Some("".to_string()), reoccuring: false, reoccuring_interval: Some("".to_string()), final_date: Some("".to_string()) } })),
+        Ok(event) => (StatusCode::OK, Json(GetEventResponse { event: event })),
+    }
+}   
+
+#[derive(Deserialize)]
+struct GetEventRequest {
+    id: String,
+}
+
+#[derive(Serialize)]
+struct GetEventResponse {
+    event: GetEvent,
+}
+
+async fn post_get_all_events(Json(payload): Json<GetAllEventsRequest>) -> (StatusCode, Json<GetAllEventsResponse>) {
+    let response = get_all_events(payload.id);
+
+    match response {
+        Err(_) => (StatusCode::NOT_FOUND, Json(GetAllEventsResponse { events: vec![] })),
+        Ok(events) => (StatusCode::OK, Json(GetAllEventsResponse { events: events })),
+    }
+}
+
+#[derive(Deserialize)]
+struct GetAllEventsRequest {
+    id: String,
+}
+
+#[derive(Serialize)]
+struct GetAllEventsResponse {
+    events: Vec<GetEvent>,
+}
+
+
+
 
 
