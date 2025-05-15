@@ -5,6 +5,7 @@ use money_jar_core::hello;
 use serde::{Deserialize, Serialize};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use money_jar_core::db_models::users::users_crud::*;
+use money_jar_core::db_models::friends::friends_crud::*;
 
 #[tokio::main]
 async fn main() {
@@ -18,14 +19,20 @@ async fn main() {
     let app = Router::new()
         .route("/", get(root))
         .route("/api/hello", post(hello_handler))
-        //user routes          backend api call uses camel case convention while core calls use snake_case convention
-        .route("/api/CreateUser", post(post_create_user)); //takes name, email returns id
-        //.route("/api/UpdateName", post(UpdateName)) //takes id, name returns message
-        //.route("/api/UpdateEmail", post(UpdateEmail)) //takes id, email returns message
-        //.route("/api/UpdatePhone", post(UpdatePhone)) //takes id, phone returns message
-        //.route("/api/GetName", post(GetName)) //takes id returns name
-        //.route("/api/GetEmail", post(GetEmail)) //takes id returns email
-        //.route("/api/GetPhone", post(GetPhone)); //takes id returns phone
+        //user routes          
+        .route("/api/CreateUser", post(post_create_user)) //takes name, email returns id
+        .route("/api/UpdateName", post(post_update_name)) //takes id, name returns message
+        .route("/api/UpdateEmail", post(post_update_email)) //takes id, email returns message
+        .route("/api/UpdatePhone", post(post_update_phone)) //takes id, phone returns message
+        .route("/api/GetName", post(post_get_name)) //takes id returns name
+        .route("/api/GetEmail", post(post_get_email)) //takes id returns email
+        .route("/api/GetPhone", post(post_get_phone)) //takes id returns phone
+        .route("/api/Login", post(post_login)) //takes email, password returns id
+        //friend routes
+        .route("/api/CreateFriend", post(post_create_friend)) //takes id, friend_id returns message
+        .route("/api/GetFriends", post(post_get_friends)) //takes id returns friends
+        .route("/api/DeleteFriend", post(post_delete_friend)); //takes id, friend_id returns message
+
 
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:2000").await.unwrap();
@@ -54,12 +61,12 @@ struct HelloResponse {
 
 //user routes
 
-async fn post_create_user(Json(payload): Json<CreateUserRequest>) -> (StatusCode, Json<CreateUserResponse>) {
-    let response = create_user(payload.name, payload.email);
+async fn post_create_user(Json(payload): Json<CreateUserRequest>) -> StatusCode {
+    let response = create_user(payload.name, payload.email, payload.password);
 
     match response {
-        Err(e) => (StatusCode::NOT_FOUND, Json(CreateUserResponse { message: e.to_string() })),
-        Ok(id) => (StatusCode::OK, Json(CreateUserResponse { message: id })),
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
     }
 }
 
@@ -67,110 +74,207 @@ async fn post_create_user(Json(payload): Json<CreateUserRequest>) -> (StatusCode
 struct CreateUserRequest {
     name: String,
     email: String,
+    password: String,
+}
+
+
+//
+async fn post_update_name(Json(payload): Json<UpdateNameRequest>) -> StatusCode{
+    let response = update_name(payload.id, payload.name);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+
+}
+//
+#[derive(Deserialize)]
+struct UpdateNameRequest {
+    id: String,
+    name: String,
+}
+//
+//
+async fn post_update_email(Json(payload): Json<UpdateEmailRequest>) -> StatusCode {
+    let response = update_email(payload.id, payload.email);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+//
+#[derive(Deserialize)]
+struct UpdateEmailRequest {
+    id: String,
+    email: String,
+}
+//
+
+//
+async fn post_update_phone(Json(payload): Json<UpdatePhoneRequest>) -> StatusCode {
+    let response = update_phone(payload.id, payload.phone);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+//
+#[derive(Deserialize)]
+struct UpdatePhoneRequest {
+    id: String,
+    phone: String,
+}
+
+async fn post_get_name(Json(payload): Json<GetNameRequest>) -> (StatusCode, Json<GetNameResponse>) {
+    let response = get_name(payload.id);
+
+    match response {
+        Err(e) => (StatusCode::NOT_FOUND, Json(GetNameResponse { name: e.to_string() })),
+        Ok(name) => (StatusCode::OK, Json(GetNameResponse { name: name })),
+    }
+}
+//
+#[derive(Deserialize)]
+struct GetNameRequest {
+    id: String,
+}
+//
+#[derive(Serialize)]
+struct GetNameResponse {
+    name: String,
+}
+//
+async fn post_get_email(Json(payload): Json<GetEmailRequest>) -> (StatusCode, Json<GetEmailResponse>) {
+    let response = get_email(payload.id);
+
+    match response {
+        Err(e) => (StatusCode::NOT_FOUND, Json(GetEmailResponse { email: e.to_string() })),
+        Ok(email) => (StatusCode::OK, Json(GetEmailResponse { email: email })),
+    }
+}
+//
+#[derive(Deserialize)]
+struct GetEmailRequest {
+    id: String,
+}
+//
+#[derive(Serialize)]
+struct GetEmailResponse {
+    email: String,
+}
+//
+async fn post_get_phone(Json(payload): Json<GetPhoneRequest>) -> (StatusCode, Json<GetPhoneResponse>){
+    let response = get_phone(payload.id);
+
+    match response {
+        Err(e) => (StatusCode::NOT_FOUND, Json(GetPhoneResponse { phone: e.to_string() })),
+        Ok(phone) => (StatusCode::OK, Json(GetPhoneResponse { phone: phone.unwrap() })),
+}
+}
+#[derive(Deserialize)]
+struct GetPhoneRequest {
+    id: String
+}
+//
+#[derive(Serialize)]
+struct GetPhoneResponse {
+    phone: String
+}
+
+async fn post_delete_user(Json(payload): Json<DeleteUserRequest>) -> StatusCode {
+    let response = delete_user(payload.id);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct DeleteUserRequest {
+    id: String,
+}
+
+
+
+async fn post_login(Json(payload): Json<LoginRequest>) -> (StatusCode, Json<LoginResponse>) {
+    let response = get_id(payload.email, payload.password);
+
+    match response {
+        Err(_) => (StatusCode::NOT_FOUND, Json(LoginResponse { id: "".to_string() })),
+        Ok(id) => (StatusCode::OK, Json(LoginResponse { id: id }))
+    }
+}
+
+#[derive(Deserialize)]
+struct LoginRequest {
+    email: String,
+    password: String,
 }
 
 #[derive(Serialize)]
-struct CreateUserResponse {
-    message: String,
+struct LoginResponse {
+    id: String,
 }
-//
-// async fn UpdateName(Json(payload): Json<UpdateNameRequest>) -> (StatusCode, Json<UpdateNameResponse>) {
-//     let response = update_name(payload.id, payload.name);
-//     (StatusCode::OK, Json(UpdateNameResponse { message: response }))
-// }
-//
-// #[derive(Deserialize)]
-// struct UpdateNameRequest {
-//     id: String,
-//     name: String,
-// }
-//
-// #[derive(Serialize)]
-// struct UpdateNameResponse {
-//     message: String,
-// }
-//
-// async fn UpdateEmail(Json(payload): Json<UpdateEmailRequest>) -> (StatusCode, Json<UpdateEmailResponse>) {
-//     let response = update_email(payload.id, payload.email);
-//     (StatusCode::OK, Json(UpdateEmailResponse { message: response }))
-// }
-//
-// #[derive(Deserialize)]
-// struct UpdateEmailRequest {
-//     id: String,
-//     email: String,
-// }
-//
-// #[derive(Serialize)]
-// struct UpdateEmailResponse {
-//     message: String,
-// }
-//
-// async fn UpdatePhone(Json(payload): Json<UpdatePhoneRequest>) -> (StatusCode, Json<UpdatePhoneResponse>) {
-//     let response = update_phone(payload.id, payload.phone);
-//     (StatusCode::OK, Json(UpdatePhoneResponse { message: response }))
-// }
-//
-// #[derive(Deserialize)]
-// struct UpdatePhoneRequest {
-//     id: String,
-//     phone: String,
-// }
-//
-// #[derive(Serialize)]
-// struct UpdatePhoneResponse {
-//     message: String,
-// }
-//
-// async fn GetName(Json(payload): Json<GetNameRequest>) -> (StatusCode, Json<GetNameResponse>) {
-//     let response = get_name(payload.id);
-//     (StatusCode::OK, Json(GetNameResponse { name: response }))
-// }
-//
-// #[derive(Deserialize)]
-// struct GetNameRequest {
-//     id: String,
-// }
-//
-// #[derive(Serialize)]
-// struct GetNameResponse {
-//     name: String,
-// }
-//
-// async fn GetEmail(Json(payload): Json<GetEmailRequest>) -> (StatusCode, Json<GetEmailResponse>) {
-//     let response = get_email(payload.id);
-//     (StatusCode::OK, Json(GetEmailResponse { email: response }))
-// }
-//
-// #[derive(Deserialize)]
-// struct GetEmailRequest {
-//     id: String,
-// }
-//
-// #[derive(Serialize)]
-// struct GetEmailResponse {
-//     email: String,
-// }
-//
-// async fn GetPhone(Json(payload): Json<GetPhoneRequest>) -> (StatusCode, Json<GetPhoneResponse>) {
-//     let response = get_phone(payload.id);
-//
-//     match response {
-//         Err => return (StatusCode::NOT_FOUND, Json(GetPhoneResponse { phone: String::from("") })),
-//         Ok(Some()) => return (StatusCode::NOT_FOUND, Json(GetPhoneResponse { phone: String::from("") })),
-//     }
-//
-//     (StatusCode::OK, Json(GetPhoneResponse { phone: response }))
-// }
-//
-// #[derive(Deserialize)]
-// struct GetPhoneRequest {
-//     id: String,
-// }
-//
-// #[derive(Serialize)]
-// struct GetPhoneResponse {
-//     phone: String,
-// }
+
+
+
+//friend routes
+
+
+async fn post_create_friend(Json(payload): Json<CreateFriendRequest>) -> StatusCode {
+    let response = create_friend(payload.id, payload.friend_id);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct CreateFriendRequest {
+    id: String,
+    friend_id: String,
+}
+
+
+
+async fn post_get_friends(Json(payload): Json<GetFriendsRequest>) -> Result<(StatusCode, Json<GetFriendsResponse>), (StatusCode, Json<String>)> {
+    let response = get_friends(payload.id);
+
+    match response {
+        Err(e) => Err((StatusCode::NOT_FOUND, Json(e.to_string()))),
+        Ok(friends) => Ok((StatusCode::OK, Json(GetFriendsResponse { friends: friends }))),
+    }
+}
+
+#[derive(Deserialize)]
+struct GetFriendsRequest {
+    id: String,
+}
+
+#[derive(Serialize)]
+struct GetFriendsResponse {
+    friends: Vec<String>,
+}
+
+
+async fn post_delete_friend(Json(payload): Json<DeleteFriendRequest>) -> StatusCode {
+    let response = delete_friend(&payload.id, &payload.friend_id);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct DeleteFriendRequest {
+    id: String,
+    friend_id: String,
+}
 
 
