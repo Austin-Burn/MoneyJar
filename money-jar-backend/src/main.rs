@@ -30,6 +30,7 @@ async fn main() {
         .route("/api/GetName", post(post_get_name)) //takes id returns name
         .route("/api/GetEmail", post(post_get_email)) //takes id returns email
         .route("/api/GetPhone", post(post_get_phone)) //takes id returns phone
+        .route("/api/DeleteUser", post(post_delete_user)) //takes id returns message
         .route("/api/Login", post(post_login)) //takes email, password returns id
         //friend routes
         .route("/api/CreateFriend", post(post_create_friend)) //takes id, friend_id returns message
@@ -38,8 +39,17 @@ async fn main() {
         //event routes
         .route("/api/CreateEvent", post(post_create_event)) //takes id, owner_id, name, reoccuring returns message
         .route("/api/GetEvent", post(post_get_event)) //takes id returns event
-        .route("/api/UpdateEvent", post(post_event_update_name)) //takes id, name returns message
+        .route("/api/GetAllEvents", post(post_get_all_events)) //takes id returns all events
+        .route("/api/UpdateEventOwnerId", post(post_update_owner_id)) //takes id, owner_id returns message
+        .route("/api/UpdateEventName", post(post_event_update_name)) //takes id, name returns message
+        .route("/api/UpdateEventDescription", post(post_update_description)) //takes id, description returns message
+        .route("/api/UpdateEventDate", post(post_update_date)) //takes id, date returns message
+        .route("/api/UpdateEventReoccuring", post(post_update_reoccuring)) //takes id, reoccuring returns message
+        .route("/api/UpdateEventReoccuringInterval", post(post_update_reoccuring_interval)) //takes id, reoccuring_interval returns message
+        .route("/api/UpdateEventFinalDate", post(post_update_final_date)) //takes id, final_date returns message
         .route("/api/DeleteEvent", post(post_delete_event)); //takes id returns message
+        
+
 
 
 
