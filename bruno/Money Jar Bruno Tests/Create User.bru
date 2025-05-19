@@ -1,0 +1,18 @@
+meta {
+  name: Create User
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:2000/api/CreateUser
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Bob",
+    "email": "bob@example.com"
+  }
+}
