@@ -4,10 +4,7 @@ use axum::{Json, Router};
 use money_jar_core::hello;
 use serde::{Deserialize, Serialize};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use money_jar_core::db_models::users::users_crud::*;
-use money_jar_core::db_models::friends::friends_crud::*;
-use money_jar_core::db_models::events::events_crud::*;
-use money_jar_core::db_models::events::events_models::GetEvent;
+use money_jar_core::*;
 
 
 #[tokio::main]
@@ -47,8 +44,12 @@ async fn main() {
         .route("/api/UpdateEventReoccuring", post(post_update_reoccuring)) //takes id, reoccuring returns message
         .route("/api/UpdateEventReoccuringInterval", post(post_update_reoccuring_interval)) //takes id, reoccuring_interval returns message
         .route("/api/UpdateEventFinalDate", post(post_update_final_date)) //takes id, final_date returns message
-        .route("/api/DeleteEvent", post(post_delete_event)); //takes id returns message
-        
+        .route("/api/DeleteEvent", post(post_delete_event)) //takes id returns message
+        //who in what routes
+        .route("/api/CreateWhoInWhat", post(post_create_who_in_what)) //takes user_id, event_id returns message
+        .route("/api/GetUsersFromEvent", post(post_get_users_from_event)) //takes event_id returns users
+        .route("/api/GetEventsFromUser", post(post_get_events_from_user)) //takes user_id returns events
+        .route("/api/DeleteWhoInWhat", post(post_delete_who_in_what)); //takes user_id, event_id returns message
 
 
 
@@ -471,6 +472,81 @@ struct GetAllEventsRequest {
 struct GetAllEventsResponse {
     events: Vec<GetEvent>,
 }
+
+//who in what routes
+
+async fn post_create_who_in_what(Json(payload): Json<CreateWhoInWhatRequest>) -> StatusCode {
+    let response = create_who_in_what(payload.user_id, payload.event_id);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct CreateWhoInWhatRequest {
+    user_id: String,
+    event_id: String,
+}
+
+async fn post_get_users_from_event(Json(payload): Json<GetUsersFromEventRequest>) -> (StatusCode, Json<GetUsersFromEventResponse>) {
+    let response = wiw_get_users(payload.event_id);
+
+    match response {
+        Err(_) => (StatusCode::NOT_FOUND, Json(GetUsersFromEventResponse { users: vec![] })),
+        Ok(users) => (StatusCode::OK, Json(GetUsersFromEventResponse { users: users }))
+    }
+}
+
+#[derive(Deserialize)]
+struct GetUsersFromEventRequest {
+    event_id: String,
+}
+
+#[derive(Serialize)]
+struct GetUsersFromEventResponse {
+    users: Vec<String>,
+}
+
+async fn post_get_events_from_user(Json(payload): Json<GetEventsFromUserRequest>) -> (StatusCode, Json<GetEventsFromUserResponse>) {
+    let response = wiw_get_events(payload.user_id);
+
+    match response {
+        Err(_) => (StatusCode::NOT_FOUND, Json(GetEventsFromUserResponse { events: vec![] })),
+        Ok(events) => (StatusCode::OK, Json(GetEventsFromUserResponse { events: events }))
+    }
+}
+
+#[derive(Deserialize)]
+struct GetEventsFromUserRequest {
+    user_id: String,
+}
+
+#[derive(Serialize)]
+struct GetEventsFromUserResponse {
+    events: Vec<String>,
+}
+
+async fn post_delete_who_in_what(Json(payload): Json<DeleteWhoInWhatRequest>) -> StatusCode {
+    let response = delete_who_in_what(payload.user_id, payload.event_id);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct DeleteWhoInWhatRequest {
+    user_id: String,
+    event_id: String,
+}
+
+
+
+
+
 
 
 
