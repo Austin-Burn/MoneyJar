@@ -1,0 +1,18 @@
+meta {
+  name: Update Reoccuring
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:2000/api/UpdateReoccuring
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "event_id_here",
+    "reoccuring": true
+  }
+} 

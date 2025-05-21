@@ -1,0 +1,17 @@
+meta {
+  name: Get Email
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:2000/api/GetEmail
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "user_id_here"
+  }
+} 

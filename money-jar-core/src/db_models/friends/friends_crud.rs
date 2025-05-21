@@ -21,12 +21,12 @@ pub fn create_friend(friend_one: String, friend_two: String) -> Result<(), Error
     insert_into(Friends)
         .values(friend)
         .execute(conn)
-        .map_err(|e| Error::DatabaseError(diesel::result::DatabaseErrorKind::UniqueViolation, Box::new("Failed to create friend (user to friend)".to_string())))?;
+        .map_err(|_| Error::DatabaseError(diesel::result::DatabaseErrorKind::UniqueViolation, Box::new("Failed to create friend (user to friend)".to_string())))?;
     let other_friend = NewFriend::new(friend_two, friend_one);
     insert_into(Friends)
         .values(other_friend)
         .execute(conn)
-        .map_err(|e| Error::DatabaseError(diesel::result::DatabaseErrorKind::UniqueViolation, Box::new("Failed to create friend (friend to user)".to_string())))?;
+        .map_err(|_| Error::DatabaseError(diesel::result::DatabaseErrorKind::UniqueViolation, Box::new("Failed to create friend (friend to user)".to_string())))?;
     Ok(())
 
 }

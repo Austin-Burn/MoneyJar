@@ -109,12 +109,12 @@ pub fn get_phone(get_id: String) -> Result<Option<String>, Error> {
 pub fn get_id(get_email: String, get_password: String) -> Result<String, Error> {
     let conn = &mut establish_connection();
     let result = Users
-        .filter(email.eq(get_email))
-        .filter(password.eq(get_password))
+        .filter(email.eq(get_email).and(password.eq(get_password)))
         .select(id)
         .first::<String>(conn)
         .map_err(|_| Error::NotFound)?;
 
+    println!("result: {}", result);
     Ok(result)
 }
 

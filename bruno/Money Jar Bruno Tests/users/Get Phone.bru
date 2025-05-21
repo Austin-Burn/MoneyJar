@@ -1,0 +1,17 @@
+meta {
+  name: Get Phone
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:2000/api/GetPhone
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "user_id_here"
+  }
+} 

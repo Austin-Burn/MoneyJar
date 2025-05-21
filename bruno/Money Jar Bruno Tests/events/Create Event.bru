@@ -1,0 +1,19 @@
+meta {
+  name: Create Event
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:2000/api/CreateEvent
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "owner_id": "user_id_here",
+    "name": "Test Event",
+    "reoccuring": false
+  }
+} 

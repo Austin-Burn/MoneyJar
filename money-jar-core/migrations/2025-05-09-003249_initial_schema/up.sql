@@ -18,7 +18,7 @@ CREATE TABLE Events (
     owner_id VARCHAR(255) NOT NULL REFERENCES Users(id),
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
-    date VARCHAR(255),
+    event_date VARCHAR(255),
     reoccuring BOOLEAN NOT NULL,
     reoccuring_interval VARCHAR(255),
     final_date VARCHAR(255)

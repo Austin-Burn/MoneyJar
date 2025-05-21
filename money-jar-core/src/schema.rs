@@ -1,12 +1,12 @@
 ﻿// @generated automatically by Diesel CLI.
-
+#![allow(non_snake_case)]
 diesel::table! {
     Events (id) {
         id -> Text,
         owner_id -> Text,
         name -> Text,
         description -> Nullable<Text>,
-        date -> Nullable<Text>,
+        event_date -> Nullable<Text>,
         reoccuring -> Bool,
         reoccuring_interval -> Nullable<Text>,
         final_date -> Nullable<Text>,
@@ -27,7 +27,7 @@ diesel::table! {
         to_user_id -> Text,
         event_id -> Text,
         amount -> Integer,
-        date -> Text,
+        transaction_date -> Text,
     }
 }
 
