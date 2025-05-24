@@ -1,0 +1,18 @@
+meta {
+  name: Create Friend
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:2000/api/CreateFriend
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "user_id_here",
+    "friend_id": "friend_id_here"
+  }
+} 

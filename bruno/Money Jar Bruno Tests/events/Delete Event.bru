@@ -1,0 +1,17 @@
+meta {
+  name: Delete Event
+  type: http
+  seq: 10
+}
+
+post {
+  url: http://localhost:2000/api/DeleteEvent
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "event_id_here"
+  }
+} 

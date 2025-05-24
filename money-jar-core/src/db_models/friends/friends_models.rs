@@ -4,10 +4,10 @@ use crate::schema::Friends;
 
 //template for structs
 
-struct TemplateFriends {
-    id: String,
-    id_two: String
-}
+//struct TemplateFriends {
+//    id: String,
+//    id_two: String
+//}
 
 //DB MODELS
 

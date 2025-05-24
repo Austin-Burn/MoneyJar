@@ -1,0 +1,18 @@
+meta {
+  name: Update Email
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:2000/api/UpdateEmail
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "user_id_here",
+    "email": "updated@example.com"
+  }
+} 

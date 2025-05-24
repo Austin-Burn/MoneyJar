@@ -1,0 +1,18 @@
+meta {
+  name: Update Description
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:2000/api/UpdateDescription
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "event_id_here",
+    "description": "New description"
+  }
+} 

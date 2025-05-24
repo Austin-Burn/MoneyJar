@@ -6,12 +6,12 @@ use crate::schema::Users;
 
 //template for structs
 
-struct TemplateUsers {
-    id: String,
-    name: String,
-    email: String,
-    phone: String,
-}
+//struct TemplateUsers {
+//    id: String,
+//    name: String,
+//    email: String,
+//    phone: String,
+//}
 //DB MODELS
 
 
@@ -122,6 +122,21 @@ impl GetPhone {
         Self { phone }
     }
 }
+
+#[derive(Queryable)]
+#[diesel(table_name = Users)]
+pub struct GetId {
+    pub id: String,
+}
+
+impl GetId {
+    pub fn new(id: String) -> Self {
+        Self { id }
+    }
+}
+
+
+
 
 
 

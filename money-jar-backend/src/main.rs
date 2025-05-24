@@ -4,11 +4,9 @@ use axum::{Json, Router};
 use money_jar_core::hello;
 use serde::{Deserialize, Serialize};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use money_jar_core::db_models::users::users_crud::*;
-use money_jar_core::db_models::friends::friends_crud::*;
-use money_jar_core::db_models::events::events_crud::*;
-use money_jar_core::db_models::events::events_models::GetEvent;
+use money_jar_core::*;
 
+mod routes;
 
 #[tokio::main]
 async fn main() {
@@ -21,37 +19,8 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(root))
-        .route("/api/hello", post(hello_handler))
-        //user routes          
-        .route("/api/CreateUser", post(post_create_user)) //takes name, email returns id
-        .route("/api/UpdateName", post(post_update_name)) //takes id, name returns message
-        .route("/api/UpdateEmail", post(post_update_email)) //takes id, email returns message
-        .route("/api/UpdatePhone", post(post_update_phone)) //takes id, phone returns message
-        .route("/api/GetName", post(post_get_name)) //takes id returns name
-        .route("/api/GetEmail", post(post_get_email)) //takes id returns email
-        .route("/api/GetPhone", post(post_get_phone)) //takes id returns phone
-        .route("/api/DeleteUser", post(post_delete_user)) //takes id returns message
-        .route("/api/Login", post(post_login)) //takes email, password returns id
-        //friend routes
-        .route("/api/CreateFriend", post(post_create_friend)) //takes id, friend_id returns message
-        .route("/api/GetFriends", post(post_get_friends)) //takes id returns friends
-        .route("/api/DeleteFriend", post(post_delete_friend)) //takes id, friend_id returns message
-        //event routes
-        .route("/api/CreateEvent", post(post_create_event)) //takes id, owner_id, name, reoccuring returns message
-        .route("/api/GetEvent", post(post_get_event)) //takes id returns event
-        .route("/api/GetAllEvents", post(post_get_all_events)) //takes id returns all events
-        .route("/api/UpdateEventOwnerId", post(post_update_owner_id)) //takes id, owner_id returns message
-        .route("/api/UpdateEventName", post(post_event_update_name)) //takes id, name returns message
-        .route("/api/UpdateEventDescription", post(post_update_description)) //takes id, description returns message
-        .route("/api/UpdateEventDate", post(post_update_date)) //takes id, date returns message
-        .route("/api/UpdateEventReoccuring", post(post_update_reoccuring)) //takes id, reoccuring returns message
-        .route("/api/UpdateEventReoccuringInterval", post(post_update_reoccuring_interval)) //takes id, reoccuring_interval returns message
-        .route("/api/UpdateEventFinalDate", post(post_update_final_date)) //takes id, final_date returns message
-        .route("/api/DeleteEvent", post(post_delete_event)); //takes id returns message
-        
-
-
-
+        .route("/api/hello", get(hello_handler))
+        .merge(routes::all_routes());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:2000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
@@ -60,7 +29,6 @@ async fn main() {
 async fn root() -> &'static str {
     "Hello, World!"
 }
-
 
 async fn hello_handler(Json(payload): Json<HelloRequest>) -> (StatusCode, Json<HelloResponse>) {
     let response = hello(payload.name);
@@ -79,6 +47,7 @@ struct HelloResponse {
 
 //user routes
 
+/*
 async fn post_create_user(Json(payload): Json<CreateUserRequest>) -> StatusCode {
     let response = create_user(payload.name, payload.email, payload.password);
 
@@ -95,8 +64,6 @@ struct CreateUserRequest {
     password: String,
 }
 
-
-//
 async fn post_update_name(Json(payload): Json<UpdateNameRequest>) -> StatusCode{
     let response = update_name(payload.id, payload.name);
 
@@ -104,16 +71,14 @@ async fn post_update_name(Json(payload): Json<UpdateNameRequest>) -> StatusCode{
         Err(_) => StatusCode::NOT_FOUND,
         Ok(_) => StatusCode::OK
     }
-
 }
-//
+
 #[derive(Deserialize)]
 struct UpdateNameRequest {
     id: String,
     name: String,
 }
-//
-//
+
 async fn post_update_email(Json(payload): Json<UpdateEmailRequest>) -> StatusCode {
     let response = update_email(payload.id, payload.email);
 
@@ -122,15 +87,13 @@ async fn post_update_email(Json(payload): Json<UpdateEmailRequest>) -> StatusCod
         Ok(_) => StatusCode::OK
     }
 }
-//
+
 #[derive(Deserialize)]
 struct UpdateEmailRequest {
     id: String,
     email: String,
 }
-//
 
-//
 async fn post_update_phone(Json(payload): Json<UpdatePhoneRequest>) -> StatusCode {
     let response = update_phone(payload.id, payload.phone);
 
@@ -139,7 +102,7 @@ async fn post_update_phone(Json(payload): Json<UpdatePhoneRequest>) -> StatusCod
         Ok(_) => StatusCode::OK
     }
 }
-//
+
 #[derive(Deserialize)]
 struct UpdatePhoneRequest {
     id: String,
@@ -154,17 +117,17 @@ async fn post_get_name(Json(payload): Json<GetNameRequest>) -> (StatusCode, Json
         Ok(name) => (StatusCode::OK, Json(GetNameResponse { name: name })),
     }
 }
-//
+
 #[derive(Deserialize)]
 struct GetNameRequest {
     id: String,
 }
-//
+
 #[derive(Serialize)]
 struct GetNameResponse {
     name: String,
 }
-//
+
 async fn post_get_email(Json(payload): Json<GetEmailRequest>) -> (StatusCode, Json<GetEmailResponse>) {
     let response = get_email(payload.id);
 
@@ -173,30 +136,31 @@ async fn post_get_email(Json(payload): Json<GetEmailRequest>) -> (StatusCode, Js
         Ok(email) => (StatusCode::OK, Json(GetEmailResponse { email: email })),
     }
 }
-//
+
 #[derive(Deserialize)]
 struct GetEmailRequest {
     id: String,
 }
-//
+
 #[derive(Serialize)]
 struct GetEmailResponse {
     email: String,
 }
-//
+
 async fn post_get_phone(Json(payload): Json<GetPhoneRequest>) -> (StatusCode, Json<GetPhoneResponse>){
     let response = get_phone(payload.id);
 
     match response {
         Err(e) => (StatusCode::NOT_FOUND, Json(GetPhoneResponse { phone: e.to_string() })),
         Ok(phone) => (StatusCode::OK, Json(GetPhoneResponse { phone: phone.unwrap() })),
+    }
 }
-}
+
 #[derive(Deserialize)]
 struct GetPhoneRequest {
     id: String
 }
-//
+
 #[derive(Serialize)]
 struct GetPhoneResponse {
     phone: String
@@ -215,8 +179,6 @@ async fn post_delete_user(Json(payload): Json<DeleteUserRequest>) -> StatusCode 
 struct DeleteUserRequest {
     id: String,
 }
-
-
 
 async fn post_login(Json(payload): Json<LoginRequest>) -> (StatusCode, Json<LoginResponse>) {
     let response = get_id(payload.email, payload.password);
@@ -238,10 +200,7 @@ struct LoginResponse {
     id: String,
 }
 
-
-
 //friend routes
-
 
 async fn post_create_friend(Json(payload): Json<CreateFriendRequest>) -> StatusCode {
     let response = create_friend(payload.id, payload.friend_id);
@@ -257,8 +216,6 @@ struct CreateFriendRequest {
     id: String,
     friend_id: String,
 }
-
-
 
 async fn post_get_friends(Json(payload): Json<GetFriendsRequest>) -> Result<(StatusCode, Json<GetFriendsResponse>), (StatusCode, Json<String>)> {
     let response = get_friends(payload.id);
@@ -279,7 +236,6 @@ struct GetFriendsResponse {
     friends: Vec<String>,
 }
 
-
 async fn post_delete_friend(Json(payload): Json<DeleteFriendRequest>) -> StatusCode {
     let response = delete_friend(&payload.id, &payload.friend_id);
 
@@ -294,7 +250,6 @@ struct DeleteFriendRequest {
     id: String,
     friend_id: String,
 }
-
 
 //event routes
 
@@ -313,7 +268,6 @@ struct CreateEventRequest {
     name: String,
     reoccuring: bool,
 }
-
 
 async fn post_update_owner_id(Json(payload): Json<UpdateOwnerIdRequest>) -> StatusCode {
     let response = event_update_owner_id(payload.id, payload.owner_id);
@@ -471,6 +425,81 @@ struct GetAllEventsRequest {
 struct GetAllEventsResponse {
     events: Vec<GetEvent>,
 }
+
+//who in what routes
+
+async fn post_create_who_in_what(Json(payload): Json<CreateWhoInWhatRequest>) -> StatusCode {
+    let response = create_who_in_what(payload.user_id, payload.event_id);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct CreateWhoInWhatRequest {
+    user_id: String,
+    event_id: String,
+}
+
+async fn post_get_users_from_event(Json(payload): Json<GetUsersFromEventRequest>) -> (StatusCode, Json<GetUsersFromEventResponse>) {
+    let response = wiw_get_users(payload.event_id);
+
+    match response {
+        Err(_) => (StatusCode::NOT_FOUND, Json(GetUsersFromEventResponse { users: vec![] })),
+        Ok(users) => (StatusCode::OK, Json(GetUsersFromEventResponse { users: users }))
+    }
+}
+
+#[derive(Deserialize)]
+struct GetUsersFromEventRequest {
+    event_id: String,
+}
+
+#[derive(Serialize)]
+struct GetUsersFromEventResponse {
+    users: Vec<String>,
+}
+
+async fn post_get_events_from_user(Json(payload): Json<GetEventsFromUserRequest>) -> (StatusCode, Json<GetEventsFromUserResponse>) {
+    let response = wiw_get_events(payload.user_id);
+
+    match response {
+        Err(_) => (StatusCode::NOT_FOUND, Json(GetEventsFromUserResponse { events: vec![] })),
+        Ok(events) => (StatusCode::OK, Json(GetEventsFromUserResponse { events: events }))
+    }
+}
+
+#[derive(Deserialize)]
+struct GetEventsFromUserRequest {
+    user_id: String,
+}
+
+#[derive(Serialize)]
+struct GetEventsFromUserResponse {
+    events: Vec<String>,
+}
+
+async fn post_delete_who_in_what(Json(payload): Json<DeleteWhoInWhatRequest>) -> StatusCode {
+    let response = delete_who_in_what(payload.user_id, payload.event_id);
+
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+
+#[derive(Deserialize)]
+struct DeleteWhoInWhatRequest {
+    user_id: String,
+    event_id: String,
+}
+
+*/
+
+
+
 
 
 
