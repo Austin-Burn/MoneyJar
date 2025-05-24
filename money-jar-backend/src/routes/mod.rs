@@ -4,8 +4,9 @@ pub mod events;
 pub mod who_in_what;
 
 use axum::Router;
+use crate::state::AppState;
 
-pub fn all_routes() -> Router {
+pub fn all_routes() -> Router<AppState> {
     Router::new()
         .merge(users::user_routes())
         .merge(friends::friend_routes())
