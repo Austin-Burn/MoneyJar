@@ -67,6 +67,15 @@ pub fn update_password(conn: &mut SqliteConnection, get_id: String, update_passw
     Ok(())
 }
 
+pub fn get_all(conn: &mut SqliteConnection, user_id: String) -> Result<(String, String, Option<String>), Error> {
+    let result = Users
+        .filter(id.eq(user_id))
+        .select((name, email, phone))
+        .first::<(String, String, Option<String>)>(conn)
+        .map_err(|_| Error::NotFound)?;
+
+    Ok(result)
+}
 pub fn get_email(conn: &mut SqliteConnection, get_id: String) -> Result<String, Error> {
     let result = Users
         .filter(id.eq(get_id))

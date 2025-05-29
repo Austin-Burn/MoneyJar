@@ -21,9 +21,22 @@ pub fn user_routes() -> Router<AppState> {
         .route("/api/GetPhone", post(post_get_phone))
         .route("/api/DeleteUser", post(post_delete_user))
         .route("/api/Login", post(post_login))
+        .route("/api/UserGetAll", post(post_get_all))
 }
 
 // Request/Response structs
+
+#[derive(Deserialize)]
+struct UserGetAllRequest {
+    id: String,
+}
+
+#[derive(Serialize)]
+struct UserGetAllResponse {
+    name: String,
+    email: String,
+    phone: Option<String>,
+}
 #[derive(Deserialize)]
 struct CreateUserRequest {
     name: String,
@@ -108,7 +121,17 @@ async fn post_create_user(
         Ok(_) => StatusCode::OK
     }
 }
-
+async fn post_get_all(
+    State(state): State<AppState>,
+    Json(payload): Json<UserGetAllRequest>
+) -> (StatusCode, Json<UserGetAllResponse>) {
+    let mut conn = state.pool.get().unwrap();
+    let response = get_all(&mut conn, payload.id);
+    match response {
+        Err(_) => (StatusCode::NOT_FOUND, Json(UserGetAllResponse { name: "".to_string(), email: "".to_string(), phone: None })),
+        Ok(user) => (StatusCode::OK, Json(UserGetAllResponse { name: user.0, email: user.1, phone: user.2 })),
+    }
+}
 async fn post_update_name(
     State(state): State<AppState>,
     Json(payload): Json<UpdateNameRequest>

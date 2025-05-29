@@ -89,6 +89,14 @@ impl UpdatePassword {
 //get by id
 #[derive(Queryable)]
 #[diesel(table_name = Users)]
+pub struct UserGetAll {
+    pub name: String,
+    pub email: String,
+    pub phone: Option<String>,
+}
+
+#[derive(Queryable)]
+#[diesel(table_name = Users)]
 pub struct GetName {
     pub name: String,
 }

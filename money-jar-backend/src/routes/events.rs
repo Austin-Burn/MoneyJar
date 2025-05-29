@@ -100,16 +100,21 @@ struct GetAllEventsResponse {
     events: Vec<GetEvent>,
 }
 
+#[derive(Serialize)]
+struct CreateEventResponse {
+    id: String,
+}
+
 // Route handlers
 async fn post_create_event(
     State(state): State<AppState>,
     Json(payload): Json<CreateEventRequest>
-) -> StatusCode {
+) -> (StatusCode, Json<CreateEventResponse>) {
     let mut conn = state.pool.get().unwrap();
     let response = create_event(&mut conn, payload.owner_id, payload.name, payload.reoccuring);
     match response {
-        Err(_) => StatusCode::NOT_FOUND,
-        Ok(_) => StatusCode::OK
+        Err(_) => (StatusCode::NOT_FOUND, Json(CreateEventResponse { id: String::new() })),
+        Ok(id) => (StatusCode::OK, Json(CreateEventResponse { id }))
     }
 }
 
