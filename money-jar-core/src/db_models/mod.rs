@@ -3,10 +3,11 @@ pub mod users;
 pub mod friends;
 pub mod events;
 pub mod whoInWhat;
+pub mod transactions;
 
 // Re-export all submodules
 pub use users::*;
 pub use friends::*;
 pub use events::*;
 pub use whoInWhat::*;
-
+pub use transactions::*;

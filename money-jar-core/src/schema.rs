@@ -1,4 +1,4 @@
-﻿// @generated automatically by Diesel CLI.
+// @generated automatically by Diesel CLI.
 
 diesel::table! {
     Events (id) {
@@ -28,6 +28,8 @@ diesel::table! {
         event_id -> Text,
         amount -> Integer,
         date -> Text,
+        payment_method -> Text,
+        comment -> Nullable<Text>,
     }
 }
 
