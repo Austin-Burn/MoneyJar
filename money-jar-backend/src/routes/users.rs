@@ -3,12 +3,14 @@ use axum::{
     routing::post,
     Json,
     Router,
+    extract::State,
 };
 use serde::{Deserialize, Serialize};
 use money_jar_core::*;
+use crate::state::AppState;
 
 // Route definitions
-pub fn user_routes() -> Router {
+pub fn user_routes() -> Router<AppState> {
     Router::new()
         .route("/api/CreateUser", post(post_create_user))
         .route("/api/UpdateName", post(post_update_name))
@@ -19,9 +21,22 @@ pub fn user_routes() -> Router {
         .route("/api/GetPhone", post(post_get_phone))
         .route("/api/DeleteUser", post(post_delete_user))
         .route("/api/Login", post(post_login))
+        .route("/api/UserGetAll", post(post_get_all))
 }
 
 // Request/Response structs
+
+#[derive(Deserialize)]
+struct UserGetAllRequest {
+    id: String,
+}
+
+#[derive(Serialize)]
+struct UserGetAllResponse {
+    name: String,
+    email: String,
+    phone: Option<String>,
+}
 #[derive(Deserialize)]
 struct CreateUserRequest {
     name: String,
@@ -95,56 +110,94 @@ struct LoginResponse {
 }
 
 // Route handlers
-async fn post_create_user(Json(payload): Json<CreateUserRequest>) -> StatusCode {
-    let response = create_user(payload.name, payload.email, payload.password);
+async fn post_create_user(
+    State(state): State<AppState>,
+    Json(payload): Json<CreateUserRequest>
+) -> StatusCode {
+    let mut conn = state.pool.get().unwrap();
+    let response = create_user(&mut conn, payload.name, payload.email, payload.password);
+    match response {
+        Err(_) => StatusCode::NOT_FOUND,
+        Ok(_) => StatusCode::OK
+    }
+}
+async fn post_get_all(
+    State(state): State<AppState>,
+    Json(payload): Json<UserGetAllRequest>
+) -> (StatusCode, Json<UserGetAllResponse>) {
+    let mut conn = state.pool.get().unwrap();
+    let response = get_all(&mut conn, payload.id);
+    match response {
+        Err(_) => (StatusCode::NOT_FOUND, Json(UserGetAllResponse { name: "".to_string(), email: "".to_string(), phone: None })),
+        Ok(user) => (StatusCode::OK, Json(UserGetAllResponse { name: user.0, email: user.1, phone: user.2 })),
+    }
+}
+async fn post_update_name(
+    State(state): State<AppState>,
+    Json(payload): Json<UpdateNameRequest>
+) -> StatusCode {
+    let mut conn = state.pool.get().unwrap();
+    let response = update_name(&mut conn, payload.id, payload.name);
     match response {
         Err(_) => StatusCode::NOT_FOUND,
         Ok(_) => StatusCode::OK
     }
 }
 
-async fn post_update_name(Json(payload): Json<UpdateNameRequest>) -> StatusCode {
-    let response = update_name(payload.id, payload.name);
+async fn post_update_email(
+    State(state): State<AppState>,
+    Json(payload): Json<UpdateEmailRequest>
+) -> StatusCode {
+    let mut conn = state.pool.get().unwrap();
+    let response = update_email(&mut conn, payload.id, payload.email);
     match response {
         Err(_) => StatusCode::NOT_FOUND,
         Ok(_) => StatusCode::OK
     }
 }
 
-async fn post_update_email(Json(payload): Json<UpdateEmailRequest>) -> StatusCode {
-    let response = update_email(payload.id, payload.email);
+async fn post_update_phone(
+    State(state): State<AppState>,
+    Json(payload): Json<UpdatePhoneRequest>
+) -> StatusCode {
+    let mut conn = state.pool.get().unwrap();
+    let response = update_phone(&mut conn, payload.id, payload.phone);
     match response {
         Err(_) => StatusCode::NOT_FOUND,
         Ok(_) => StatusCode::OK
     }
 }
 
-async fn post_update_phone(Json(payload): Json<UpdatePhoneRequest>) -> StatusCode {
-    let response = update_phone(payload.id, payload.phone);
-    match response {
-        Err(_) => StatusCode::NOT_FOUND,
-        Ok(_) => StatusCode::OK
-    }
-}
-
-async fn post_get_name(Json(payload): Json<GetNameRequest>) -> (StatusCode, Json<GetNameResponse>) {
-    let response = get_name(payload.id);
+async fn post_get_name(
+    State(state): State<AppState>,
+    Json(payload): Json<GetNameRequest>
+) -> (StatusCode, Json<GetNameResponse>) {
+    let mut conn = state.pool.get().unwrap();
+    let response = get_name(&mut conn, payload.id);
     match response {
         Err(e) => (StatusCode::NOT_FOUND, Json(GetNameResponse { name: e.to_string() })),
         Ok(name) => (StatusCode::OK, Json(GetNameResponse { name: name })),
     }
 }
 
-async fn post_get_email(Json(payload): Json<GetEmailRequest>) -> (StatusCode, Json<GetEmailResponse>) {
-    let response = get_email(payload.id);
+async fn post_get_email(
+    State(state): State<AppState>,
+    Json(payload): Json<GetEmailRequest>
+) -> (StatusCode, Json<GetEmailResponse>) {
+    let mut conn = state.pool.get().unwrap();
+    let response = get_email(&mut conn, payload.id);
     match response {
         Err(e) => (StatusCode::NOT_FOUND, Json(GetEmailResponse { email: e.to_string() })),
         Ok(email) => (StatusCode::OK, Json(GetEmailResponse { email: email })),
     }
 }
 
-async fn post_get_phone(Json(payload): Json<GetPhoneRequest>) -> (StatusCode, Json<GetPhoneResponse>) {
-    match get_phone(payload.id) {
+async fn post_get_phone(
+    State(state): State<AppState>,
+    Json(payload): Json<GetPhoneRequest>
+) -> (StatusCode, Json<GetPhoneResponse>) {
+    let mut conn = state.pool.get().unwrap();
+    match get_phone(&mut conn, payload.id) {
         Err(e) => (
             StatusCode::NOT_FOUND,
             Json(GetPhoneResponse { phone: e.to_string() }),
@@ -160,16 +213,24 @@ async fn post_get_phone(Json(payload): Json<GetPhoneRequest>) -> (StatusCode, Js
     }
 }
 
-async fn post_delete_user(Json(payload): Json<DeleteUserRequest>) -> StatusCode {
-    let response = delete_user(payload.id);
+async fn post_delete_user(
+    State(state): State<AppState>,
+    Json(payload): Json<DeleteUserRequest>
+) -> StatusCode {
+    let mut conn = state.pool.get().unwrap();
+    let response = delete_user(&mut conn, payload.id);
     match response {
         Err(_) => StatusCode::NOT_FOUND,
         Ok(_) => StatusCode::OK
     }
 }
 
-async fn post_login(Json(payload): Json<LoginRequest>) -> (StatusCode, Json<LoginResponse>) {
-    let response = get_id(payload.email, payload.password);
+async fn post_login(
+    State(state): State<AppState>,
+    Json(payload): Json<LoginRequest>
+) -> (StatusCode, Json<LoginResponse>) {
+    let mut conn = state.pool.get().unwrap();
+    let response = get_id(&mut conn, payload.email, payload.password);
     match response {
         Err(_) => (StatusCode::NOT_FOUND, Json(LoginResponse { id: "".to_string() })),
         Ok(id) => (StatusCode::OK, Json(LoginResponse { id: id }))

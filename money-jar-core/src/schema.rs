@@ -1,5 +1,5 @@
-﻿// @generated automatically by Diesel CLI.
-#![allow(non_snake_case)]
+// @generated automatically by Diesel CLI.
+
 diesel::table! {
     Events (id) {
         id -> Text,
@@ -27,7 +27,9 @@ diesel::table! {
         to_user_id -> Text,
         event_id -> Text,
         amount -> Integer,
-        transaction_date -> Text,
+        date -> Text,
+        payment_method -> Text,
+        comment -> Nullable<Text>,
     }
 }
 

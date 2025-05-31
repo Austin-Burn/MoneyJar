@@ -5,8 +5,13 @@ use money_jar_core::hello;
 use serde::{Deserialize, Serialize};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use money_jar_core::*;
+use diesel::r2d2::{self, ConnectionManager};
+use diesel::SqliteConnection;
 
 mod routes;
+mod state;
+use routes::all_routes;
+use state::AppState;
 
 #[tokio::main]
 async fn main() {
@@ -17,12 +22,21 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let app = Router::new()
-        .route("/", get(root))
-        .route("/api/hello", get(hello_handler))
-        .merge(routes::all_routes());
+    let manager = ConnectionManager::<SqliteConnection>::new("MoneyJarDB.sqlite");
+    let pool = r2d2::Pool::builder()
+        .build(manager)
+        .expect("Failed to create pool");
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:2000").await.unwrap();
+    let state = AppState { pool };
+
+    let app = Router::new()
+        .merge(all_routes())
+        .with_state(state);
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:2000")
+        .await
+        .unwrap();
+    println!("listening on {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();
 }
 

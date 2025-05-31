@@ -1,6 +1,6 @@
 from user_tests import user_tests
 from friends_tests import friend_tests
-
+from event_tests import event_tests
 
 def main():
     print("Available test suites:")
@@ -17,7 +17,7 @@ def main():
     elif choice == "2":
         friend_tests()
     elif choice == "3":
-        EventTests().run_all()
+        event_tests()
     elif choice == "4":
         WhoInWhatTests().run_all()
     elif choice == "5":
@@ -26,6 +26,8 @@ def main():
         results["user_results"] = user_results[2]
         friend_results = friend_tests((user_results[0], user_results[1]))
         results["friend_results"] = friend_results
+        event_results = event_tests((user_results[0], user_results[1]))
+        results["event_results"] = event_results
         print(results)
     else:
         print("Invalid choice!")
