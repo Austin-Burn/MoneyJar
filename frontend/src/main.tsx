@@ -1,4 +1,4 @@
-import {RouterProvider, createRouter} from "@tanstack/react-router";
+import {createRouter, RouterProvider} from "@tanstack/react-router";
 import {StrictMode} from "react";
 import ReactDOM from "react-dom/client";
 
@@ -7,31 +7,38 @@ import {routeTree} from "./routeTree.gen";
 
 import "./styles.css";
 import "./styles/default.sass";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import reportWebVitals from "./reportWebVitals.ts";
+
+const queryClient = new QueryClient();
 
 // Create a new router instance
 const router = createRouter({
-    routeTree,
-    context: {},
-    defaultPreload: "intent",
-    scrollRestoration: true,
-    defaultStructuralSharing: true,
-    defaultPreloadStaleTime: 0,
+	routeTree,
+	context: {
+		queryClient,
+	},
+	defaultPreload: "intent",
+	scrollRestoration: true,
+	defaultStructuralSharing: true,
+	defaultPreloadStaleTime: 0,
 });
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
-    interface Register {
-        router: typeof router;
-    }
+	interface Register {
+		router: typeof router;
+	}
 }
 
 // Render the app
 const root = ReactDOM.createRoot(document.body);
 root.render(
-    <StrictMode>
-        <RouterProvider router={router}/>
-    </StrictMode>,
+	<StrictMode>
+		<QueryClientProvider client={queryClient}>
+			<RouterProvider router={router} />
+		</QueryClientProvider>
+	</StrictMode>,
 );
 
 // If you want to start measuring performance in your app, pass a function

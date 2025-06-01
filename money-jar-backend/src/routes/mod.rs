@@ -1,17 +1,17 @@
-pub mod users;
-pub mod friends;
 pub mod events;
-pub mod who_in_what;
+pub mod friends;
 pub mod transactions;
+pub mod users;
+pub mod who_in_what;
 
-use axum::Router;
 use crate::state::AppState;
+use axum::Router;
 
 pub fn all_routes() -> Router<AppState> {
     Router::new()
-        .merge(users::user_routes())
-        .merge(friends::friend_routes())
-        .merge(events::event_routes())
-        .merge(who_in_what::who_in_what_routes())
-        .merge(transactions::transaction_routes())
-} 
+        .nest("/api", users::user_routes())
+        .nest("/api", friends::friend_routes())
+        .nest("/api", events::event_routes())
+        .nest("/api", who_in_what::who_in_what_routes())
+        .nest("/api", transactions::transaction_routes())
+}

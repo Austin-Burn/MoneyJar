@@ -1,23 +1,29 @@
-use axum::{
-    http::StatusCode,
-    routing::post,
-    Json,
-    Router,
-    extract::State,
-};
-use serde::{Deserialize, Serialize};
-use money_jar_core::*;
 use crate::state::AppState;
+use axum::{extract::State, http::StatusCode, routing::post, Json, Router};
+use money_jar_core::*;
+use serde::{Deserialize, Serialize};
 
 // Route definitions
 pub fn transaction_routes() -> Router<AppState> {
     Router::new()
-        .route("/api/CreateTransaction", post(post_create_transaction))
-        .route("/api/GetTransactionsBySent", post(post_get_transactions_by_sent))
-        .route("/api/GetTransactionsByReceived", post(post_get_transactions_by_received))
-        .route("/api/GetTransactionsByEvent", post(post_get_transactions_by_event))
-        .route("/api/UpdateTransactionComment", post(post_update_transaction_comment))
-        .route("/api/DeleteTransaction", post(post_delete_transaction))
+        .route("/CreateTransaction", post(post_create_transaction))
+        .route(
+            "/GetTransactionsBySent",
+            post(post_get_transactions_by_sent),
+        )
+        .route(
+            "/GetTransactionsByReceived",
+            post(post_get_transactions_by_received),
+        )
+        .route(
+            "/GetTransactionsByEvent",
+            post(post_get_transactions_by_event),
+        )
+        .route(
+            "/UpdateTransactionComment",
+            post(post_update_transaction_comment),
+        )
+        .route("/DeleteTransaction", post(post_delete_transaction))
 }
 
 // Request/Response structs
@@ -74,7 +80,7 @@ struct TransactionResponse {
 // Route handlers
 async fn post_create_transaction(
     State(state): State<AppState>,
-    Json(payload): Json<CreateTransactionRequest>
+    Json(payload): Json<CreateTransactionRequest>,
 ) -> StatusCode {
     let mut conn = state.pool.get().unwrap();
     let response = create_transaction(
@@ -89,13 +95,13 @@ async fn post_create_transaction(
     );
     match response {
         Err(_) => StatusCode::NOT_FOUND,
-        Ok(_) => StatusCode::OK
+        Ok(_) => StatusCode::OK,
     }
 }
 
 async fn post_get_transactions_by_sent(
     State(state): State<AppState>,
-    Json(payload): Json<GetTransactionsBySentRequest>
+    Json(payload): Json<GetTransactionsBySentRequest>,
 ) -> (StatusCode, Json<Vec<TransactionResponse>>) {
     let mut conn = state.pool.get().unwrap();
     let response = get_transaction_by_sent(&mut conn, payload.from_user_id);
@@ -122,7 +128,7 @@ async fn post_get_transactions_by_sent(
 
 async fn post_get_transactions_by_received(
     State(state): State<AppState>,
-    Json(payload): Json<GetTransactionsByReceivedRequest>
+    Json(payload): Json<GetTransactionsByReceivedRequest>,
 ) -> (StatusCode, Json<Vec<TransactionResponse>>) {
     let mut conn = state.pool.get().unwrap();
     let response = get_transaction_by_received(&mut conn, payload.to_user_id);
@@ -149,7 +155,7 @@ async fn post_get_transactions_by_received(
 
 async fn post_get_transactions_by_event(
     State(state): State<AppState>,
-    Json(payload): Json<GetTransactionsByEventRequest>
+    Json(payload): Json<GetTransactionsByEventRequest>,
 ) -> (StatusCode, Json<Vec<TransactionResponse>>) {
     let mut conn = state.pool.get().unwrap();
     let response = get_transaction_by_event(&mut conn, payload.event_id);
@@ -176,24 +182,24 @@ async fn post_get_transactions_by_event(
 
 async fn post_update_transaction_comment(
     State(state): State<AppState>,
-    Json(payload): Json<UpdateTransactionCommentRequest>
+    Json(payload): Json<UpdateTransactionCommentRequest>,
 ) -> StatusCode {
     let mut conn = state.pool.get().unwrap();
     let response = update_transaction_comment(&mut conn, payload.transaction_id, payload.comment);
     match response {
         Err(_) => StatusCode::NOT_FOUND,
-        Ok(_) => StatusCode::OK
+        Ok(_) => StatusCode::OK,
     }
 }
 
 async fn post_delete_transaction(
     State(state): State<AppState>,
-    Json(payload): Json<DeleteTransactionRequest>
+    Json(payload): Json<DeleteTransactionRequest>,
 ) -> StatusCode {
     let mut conn = state.pool.get().unwrap();
     let response = delete_transaction(&mut conn, payload.transaction_id);
     match response {
         Err(_) => StatusCode::NOT_FOUND,
-        Ok(_) => StatusCode::OK
+        Ok(_) => StatusCode::OK,
     }
-} 
+}

@@ -1,20 +1,27 @@
-import { PageContainer } from "@/components/PageContainer.tsx";
-import { mdiImageEdit, mdiQrcode, mdiTrashCan } from "@mdi/js";
+import {PageContainer} from "@/components/PageContainer.tsx";
+import {MoneyJarRuntime} from "@/runtime.ts";
+import {UserApi} from "@/services/UserApi.ts";
+import {formatPhoneNumber} from "@/util.ts";
+import {mdiImageEdit, mdiQrcode, mdiTrashCan} from "@mdi/js";
 import Icon from "@mdi/react";
-import { createFileRoute } from "@tanstack/react-router";
+import {useSuspenseQuery} from "@tanstack/react-query";
+import {createFileRoute} from "@tanstack/react-router";
+import type {PropsWithChildren} from "react";
 import AccountDefaultSvg from "../../images/account-default.svg?react";
 
 export const Route = createFileRoute("/account")({
 	component: RouteComponent,
 });
 
-const User = {
-	id: "1358eb04-b790-4793-a4bc-67a48171b02f",
-	name: "John Smith",
-	email: "john.smith@example.com",
-};
-
 function RouteComponent() {
+	const { data } = useSuspenseQuery({
+		queryKey: ["user"],
+		queryFn: () =>
+			UserApi.getUserInfo("60513378-ae64-48f7-95c5-42fd36046573").pipe(
+				MoneyJarRuntime.runPromise,
+			),
+	});
+
 	return (
 		<PageContainer>
 			<div className={"flex flex-row items-center justify-between"}>
@@ -34,8 +41,8 @@ function RouteComponent() {
 						<AccountDefaultSvg />
 					</div>
 					<div className={"flex flex-col"}>
-						<h1 className={"font-semibold text-3xl"}>{User.name}</h1>
-						<p className={"text-gray-400"}>@{User.id}</p>
+						<h1 className={"font-semibold text-3xl"}>{data.name}</h1>
+						<p className={"text-gray-400"}>@{data.id}</p>
 					</div>
 				</div>
 				<div className={"flex flex-row items-center gap-4"}>
@@ -43,14 +50,9 @@ function RouteComponent() {
 				</div>
 			</div>
 			<div className={"flex flex-col gap-4"}>
-				<div>
-					<h2 className={"font-semibold text-2xl"}>Email</h2>
-					<p className={"text-lg"}>{User.email}</p>
-				</div>
-				<div>
-					<h2 className={"font-semibold text-2xl"}>Password</h2>
-					<p className={"text-lg"}>●●●●●●●●●●●●</p>
-				</div>
+				<Info label={"Email"}>{data.email}</Info>
+				<Info label={"Phone"}>{formatPhoneNumber(data.phone)}</Info>
+				<Info label={"Password"}>●●●●●●●●●●●●</Info>
 				<div className={"flex flex-row rounded-md border border-red-400 p-4"}>
 					<button
 						className={
@@ -64,5 +66,18 @@ function RouteComponent() {
 				</div>
 			</div>
 		</PageContainer>
+	);
+}
+
+type InfoProps = {
+	label: string;
+};
+
+function Info({ label, children }: PropsWithChildren<InfoProps>) {
+	return (
+		<div>
+			<h2 className={"font-semibold text-2xl"}>{label}</h2>
+			<p className={"text-lg"}>{children}</p>
+		</div>
 	);
 }

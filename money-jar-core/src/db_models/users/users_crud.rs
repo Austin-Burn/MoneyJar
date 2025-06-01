@@ -8,9 +8,19 @@ use uuid::Uuid;
 use crate::Users::dsl::Users;
 use crate::Users::*;
 
-pub fn create_user(conn: &mut SqliteConnection, new_name: String, new_email: String, new_password: String) -> Result<String, Error> {
+pub fn create_user(
+    conn: &mut SqliteConnection,
+    new_name: String,
+    new_email: String,
+    new_password: String,
+) -> Result<String, Error> {
     let new_id = Uuid::new_v4().to_string();
-    let user = NewUser::new(new_id.clone(), new_name, new_email.clone(), new_password.clone());
+    let user = NewUser::new(
+        new_id.clone(),
+        new_name,
+        new_email.clone(),
+        new_password.clone(),
+    );
 
     let email_exists = select(exists(Users.filter(email.eq(new_email))))
         .get_result::<bool>(conn)
@@ -28,7 +38,11 @@ pub fn create_user(conn: &mut SqliteConnection, new_name: String, new_email: Str
     Ok(new_id)
 }
 
-pub fn update_phone(conn: &mut SqliteConnection, get_id: String, update_phone: String) -> Result<(), Error> {
+pub fn update_phone(
+    conn: &mut SqliteConnection,
+    get_id: String,
+    update_phone: String,
+) -> Result<(), Error> {
     update(Users.filter(id.eq(get_id)))
         .set(phone.eq(update_phone))
         .execute(conn)
@@ -37,7 +51,11 @@ pub fn update_phone(conn: &mut SqliteConnection, get_id: String, update_phone: S
     Ok(())
 }
 
-pub fn update_email(conn: &mut SqliteConnection, get_id: String, update_email: String) -> Result<(), Error> {
+pub fn update_email(
+    conn: &mut SqliteConnection,
+    get_id: String,
+    update_email: String,
+) -> Result<(), Error> {
     update(Users.filter(id.eq(get_id)))
         .set(email.eq(update_email))
         .execute(conn)
@@ -46,7 +64,11 @@ pub fn update_email(conn: &mut SqliteConnection, get_id: String, update_email: S
     Ok(())
 }
 
-pub fn update_name(conn: &mut SqliteConnection, get_id: String, update_name: String) -> Result<(), Error> {
+pub fn update_name(
+    conn: &mut SqliteConnection,
+    get_id: String,
+    update_name: String,
+) -> Result<(), Error> {
     update(Users)
         .filter(id.eq(get_id))
         .set(name.eq(update_name))
@@ -56,7 +78,11 @@ pub fn update_name(conn: &mut SqliteConnection, get_id: String, update_name: Str
     Ok(())
 }
 
-pub fn update_password(conn: &mut SqliteConnection, get_id: String, update_password: String) -> Result<(), Error> {
+pub fn update_password(
+    conn: &mut SqliteConnection,
+    get_id: String,
+    update_password: String,
+) -> Result<(), Error> {
     let update_password = UpdatePassword::new(update_password);
     update(Users)
         .filter(id.eq(get_id))
@@ -67,11 +93,14 @@ pub fn update_password(conn: &mut SqliteConnection, get_id: String, update_passw
     Ok(())
 }
 
-pub fn get_all(conn: &mut SqliteConnection, user_id: String) -> Result<(String, String, Option<String>), Error> {
+pub fn get_all(
+    conn: &mut SqliteConnection,
+    user_id: String,
+) -> Result<(String, String, String, Option<String>), Error> {
     let result = Users
         .filter(id.eq(user_id))
-        .select((name, email, phone))
-        .first::<(String, String, Option<String>)>(conn)
+        .select((id, name, email, phone))
+        .first::<(String, String, String, Option<String>)>(conn)
         .map_err(|_| Error::NotFound)?;
 
     Ok(result)
@@ -105,7 +134,11 @@ pub fn get_phone(conn: &mut SqliteConnection, get_id: String) -> Result<Option<S
     Ok(phone_exists)
 }
 
-pub fn get_id(conn: &mut SqliteConnection, get_email: String, get_password: String) -> Result<String, Error> {
+pub fn get_id(
+    conn: &mut SqliteConnection,
+    get_email: String,
+    get_password: String,
+) -> Result<String, Error> {
     let result = Users
         .filter(email.eq(get_email).and(password.eq(get_password)))
         .select(id)
@@ -117,11 +150,8 @@ pub fn get_id(conn: &mut SqliteConnection, get_email: String, get_password: Stri
 }
 
 pub fn delete_user(conn: &mut SqliteConnection, get_id: String) -> Result<(), Error> {
-    delete(Users.filter(id.eq(get_id))).execute(conn).map_err(|_| Error::NotFound)?;
+    delete(Users.filter(id.eq(get_id)))
+        .execute(conn)
+        .map_err(|_| Error::NotFound)?;
     Ok(())
 }
-
-
-
-
-
