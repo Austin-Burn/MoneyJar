@@ -27,3 +27,4 @@ target/
 *storybook.log
 
 .env
+*.sqlite

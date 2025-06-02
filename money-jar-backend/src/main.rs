@@ -1,17 +1,19 @@
 use axum::http::StatusCode;
-use axum::routing::{get, post};
 use axum::{Json, Router};
-use money_jar_core::hello;
-use serde::{Deserialize, Serialize};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use money_jar_core::*;
 use diesel::r2d2::{self, ConnectionManager};
 use diesel::SqliteConnection;
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+use money_jar_core::hello;
+use money_jar_core::*;
+use serde::{Deserialize, Serialize};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod routes;
 mod state;
 use routes::all_routes;
 use state::AppState;
+
+const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../money-jar-core/migrations");
 
 #[tokio::main]
 async fn main() {
@@ -22,16 +24,20 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
+    // Create database connection pool
     let manager = ConnectionManager::<SqliteConnection>::new("MoneyJarDB.sqlite");
     let pool = r2d2::Pool::builder()
         .build(manager)
         .expect("Failed to create pool");
 
+    // Run migrations
+    let mut conn = pool.get().unwrap();
+    conn.run_pending_migrations(MIGRATIONS);
+
+    // Initialize state
     let state = AppState { pool };
 
-    let app = Router::new()
-        .merge(all_routes())
-        .with_state(state);
+    let app = Router::new().merge(all_routes()).with_state(state);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:2000")
         .await
@@ -409,7 +415,7 @@ async fn post_get_event(Json(payload): Json<GetEventRequest>) -> (StatusCode, Js
         Err(_) => (StatusCode::NOT_FOUND, Json(GetEventResponse { event: GetEvent { id: "".to_string(), owner_id: "".to_string(), name: "".to_string(), description: Some("".to_string()), event_date: Some("".to_string()), reoccuring: false, reoccuring_interval: Some("".to_string()), final_date: Some("".to_string()) } })),
         Ok(event) => (StatusCode::OK, Json(GetEventResponse { event: event })),
     }
-}   
+}
 
 #[derive(Deserialize)]
 struct GetEventRequest {
@@ -511,11 +517,3 @@ struct DeleteWhoInWhatRequest {
 }
 
 */
-
-
-
-
-
-
-
-

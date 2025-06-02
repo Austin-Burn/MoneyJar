@@ -9,8 +9,9 @@ import {
 	UpdateNameRequest,
 	UpdatePhoneRequest,
 } from "@/schema/api/user.ts";
-import {HttpClient, HttpClientRequest, HttpClientResponse,} from "@effect/platform";
-import {Effect, type Schema} from "effect";
+import {createApiRequestFunction} from "@/util.ts";
+import {HttpClient,} from "@effect/platform";
+import {Effect} from "effect";
 
 /**
  * The UserApi service provides API endpoints for User-related
@@ -27,17 +28,7 @@ export class UserApi extends Effect.Service<UserApi>()("UserApi", {
 			Effect.map(HttpClient.filterStatusOk),
 		);
 
-		const apiRequest = <A, I, R>(
-			path: string,
-			body: unknown,
-			schema: Schema.Schema<A, I, R>,
-		) =>
-			HttpClientRequest.post(path).pipe(
-				HttpClientRequest.prependUrl("/api"),
-				HttpClientRequest.bodyUnsafeJson(body),
-				httpClient.execute,
-				Effect.andThen(HttpClientResponse.schemaBodyJson(schema)),
-			);
+		const apiRequest = createApiRequestFunction(httpClient);
 
 		return {
 			createUser: (name: string, email: string, password: string) =>

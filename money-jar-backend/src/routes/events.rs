@@ -222,25 +222,11 @@ async fn post_delete_event(
 async fn post_get_event(
     State(state): State<AppState>,
     Json(payload): Json<GetEventRequest>,
-) -> (StatusCode, Json<GetEventResponse>) {
+) -> (StatusCode, Json<Option<GetEvent>>) {
     let mut conn = state.pool.get().unwrap();
     match get_event(&mut conn, payload.id) {
-        Err(e) => (
-            StatusCode::NOT_FOUND,
-            Json(GetEventResponse {
-                event: GetEvent {
-                    id: String::new(),
-                    owner_id: String::new(),
-                    name: String::new(),
-                    description: None,
-                    event_date: None,
-                    reoccuring: false,
-                    reoccuring_interval: None,
-                    final_date: None,
-                },
-            }),
-        ),
-        Ok(event) => (StatusCode::OK, Json(GetEventResponse { event })),
+        Err(e) => (StatusCode::NOT_FOUND, Json(None)),
+        Ok(event) => (StatusCode::OK, Json(Some(event))),
     }
 }
 

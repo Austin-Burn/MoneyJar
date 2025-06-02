@@ -1,10 +1,6 @@
-use diesel::{Insertable, Queryable, AsChangeset};
 use crate::schema::Events;
+use diesel::{AsChangeset, Insertable, Queryable};
 use serde::Serialize;
-
-
-
-
 
 // template for structs
 
@@ -19,7 +15,6 @@ use serde::Serialize;
 //    final_date: Option<String>
 //}
 
-
 // DB MODELS
 
 #[derive(Insertable)]
@@ -29,21 +24,23 @@ pub struct NewEvent {
     owner_id: String,
     name: String,
     reoccuring: bool,
-
 }
 
 impl NewEvent {
     pub fn new(id: String, owner_id: String, name: String, reoccuring: bool) -> Self {
-        Self { id, owner_id, name, reoccuring }
+        Self {
+            id,
+            owner_id,
+            name,
+            reoccuring,
+        }
     }
 }
-
-
 
 #[derive(AsChangeset)]
 #[diesel(table_name = Events)]
 pub struct UpdateOwnerId {
-    owner_id: String
+    owner_id: String,
 }
 
 impl UpdateOwnerId {
@@ -55,7 +52,7 @@ impl UpdateOwnerId {
 #[derive(AsChangeset)]
 #[diesel(table_name = Events)]
 pub struct EventUpdateName {
-    name: String
+    name: String,
 }
 
 impl EventUpdateName {
@@ -67,7 +64,7 @@ impl EventUpdateName {
 #[derive(AsChangeset)]
 #[diesel(table_name = Events)]
 pub struct UpdateDescription {
-    description: String
+    description: String,
 }
 
 impl UpdateDescription {
@@ -79,7 +76,7 @@ impl UpdateDescription {
 #[derive(AsChangeset)]
 #[diesel(table_name = Events)]
 pub struct UpdateEventDate {
-    event_date: String
+    event_date: String,
 }
 
 impl UpdateEventDate {
@@ -91,7 +88,7 @@ impl UpdateEventDate {
 #[derive(AsChangeset)]
 #[diesel(table_name = Events)]
 pub struct UpdateReoccuring {
-    reoccuring: bool
+    reoccuring: bool,
 }
 
 impl UpdateReoccuring {
@@ -100,23 +97,24 @@ impl UpdateReoccuring {
     }
 }
 
-
 #[derive(AsChangeset)]
 #[diesel(table_name = Events)]
 pub struct UpdateReoccuringInterval {
-    reoccuring_interval: String
+    reoccuring_interval: String,
 }
 
 impl UpdateReoccuringInterval {
     pub fn new(reoccuring_interval: String) -> Self {
-        Self { reoccuring_interval }
+        Self {
+            reoccuring_interval,
+        }
     }
 }
 
 #[derive(AsChangeset)]
 #[diesel(table_name = Events)]
-pub struct UpdateFinalDate {    
-    final_date: String
+pub struct UpdateFinalDate {
+    final_date: String,
 }
 
 impl UpdateFinalDate {
@@ -127,6 +125,7 @@ impl UpdateFinalDate {
 
 #[derive(Queryable, Serialize)]
 #[diesel(table_name = Events)]
+#[serde(rename_all = "camelCase")]
 pub struct GetEvent {
     pub id: String,
     pub owner_id: String,
@@ -135,8 +134,5 @@ pub struct GetEvent {
     pub event_date: Option<String>,
     pub reoccuring: bool,
     pub reoccuring_interval: Option<String>,
-    pub final_date: Option<String>
+    pub final_date: Option<String>,
 }
-
-
-
