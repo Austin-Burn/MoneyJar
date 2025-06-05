@@ -13,24 +13,24 @@ pub fn create_who_in_what(conn: &mut SqliteConnection, wiw_user_id: String, wiw_
     insert_into(WhoInWhat)
         .values(who_in_what)
         .execute(conn)
-        .map_err(|_| Error::NotFound)?;
+        .map_err(|e| e)?;
     Ok(())
 }
 
 pub fn wiw_get_users(conn: &mut SqliteConnection, wiw_event_id: String) -> Result<Vec<String>, Error> {
     let users: Vec<String> = WhoInWhat.filter(event_id.eq(wiw_event_id)).select(user_id).load::<String>(conn)
-    .map_err(|_| Error::NotFound)?;
+    .map_err(|e| e)?;
     Ok(users)
 }
 
 pub fn wiw_get_events(conn: &mut SqliteConnection, wiw_user_id: String) -> Result<Vec<String>, Error> {
     let events: Vec<String> = WhoInWhat.filter(user_id.eq(wiw_user_id)).select(event_id).load::<String>(conn)
-    .map_err(|_| Error::NotFound)?;
+    .map_err(|e| e)?;
     Ok(events)
 }
 
 pub fn delete_who_in_what(conn: &mut SqliteConnection, get_user_id: String, get_events_id: String) -> Result<(), Error> {
-    delete(WhoInWhat.filter(user_id.eq(get_user_id).and(event_id.eq(get_events_id)))).execute(conn).map_err(|_| Error::NotFound)?;
+    delete(WhoInWhat.filter(user_id.eq(get_user_id).and(event_id.eq(get_events_id)))).execute(conn).map_err(|e| e)?;
     Ok(())
 }
 
