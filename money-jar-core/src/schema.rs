@@ -1,4 +1,4 @@
-// @generated automatically by Diesel CLI.
+﻿// @generated automatically by Diesel CLI.
 
 diesel::table! {
     Auth (user_id) {
@@ -29,11 +29,33 @@ diesel::table! {
 }
 
 diesel::table! {
+    Items (id) {
+        id -> Text,
+        name -> Text,
+        description -> Nullable<Text>,
+        cost -> Integer,
+        payment_progress -> Integer,
+        total -> Integer,
+        recurring -> Bool,
+        iteration_count -> Integer,
+        event_id -> Text,
+    }
+}
+
+diesel::table! {
+    PayBatches (id, transaction_id) {
+        id -> Text,
+        transaction_id -> Text,
+        date -> Text,
+    }
+}
+
+diesel::table! {
     Transactions (id) {
         id -> Integer,
         from_user_id -> Text,
         to_user_id -> Text,
-        event_id -> Text,
+        item_id -> Text,
         amount -> Integer,
         date -> Text,
         payment_method -> Text,
@@ -55,6 +77,7 @@ diesel::table! {
         email -> Text,
         phone -> Nullable<Text>,
         password -> Text,
+        balance -> Integer,
     }
 }
 
@@ -67,7 +90,9 @@ diesel::table! {
 
 diesel::joinable!(Auth -> Users (user_id));
 diesel::joinable!(Events -> Users (owner_id));
-diesel::joinable!(Transactions -> Events (event_id));
+diesel::joinable!(Items -> Events (event_id));
+diesel::joinable!(PayBatches -> Transactions (transaction_id));
+diesel::joinable!(Transactions -> Events (item_id));
 diesel::joinable!(UserPaymentMethods -> Users (user_id));
 diesel::joinable!(WhoInWhat -> Events (event_id));
 diesel::joinable!(WhoInWhat -> Users (user_id));
@@ -76,6 +101,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     Auth,
     Events,
     Friends,
+    Items,
+    PayBatches,
     Transactions,
     UserPaymentMethods,
     Users,

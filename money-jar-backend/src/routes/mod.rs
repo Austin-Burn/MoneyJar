@@ -4,9 +4,11 @@ pub mod friends;
 pub mod transactions;
 pub mod users;
 pub mod who_in_what;
+pub mod items;
+pub mod pay_batches;
 
-use crate::state::AppState;
 use axum::Router;
+use crate::state::AppState;
 
 pub fn all_routes() -> Router<AppState> {
     Router::new()
@@ -16,4 +18,6 @@ pub fn all_routes() -> Router<AppState> {
         .nest("/api", who_in_what::who_in_what_routes())
         .nest("/api", transactions::transaction_routes())
         .nest("/api", authentication::auth_routes())
+        .merge(items::item_routes())
+        .merge(pay_batches::pay_batch_routes())
 }

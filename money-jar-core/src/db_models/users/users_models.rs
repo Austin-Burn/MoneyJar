@@ -1,4 +1,4 @@
-use diesel::{Insertable, Queryable, AsChangeset};
+use diesel::{Insertable, Queryable, Identifiable, AsChangeset};
 use crate::schema::Users;
 
 
@@ -24,12 +24,14 @@ pub struct NewUser {
     id: String,
     name: String,
     email: String,
+    phone: Option<String>,
     password: String,
+    balance: i32
 }
 
 impl NewUser {
     pub fn new(id: String, name: String, email: String, password: String) -> Self {
-        Self { id, name, email, password }
+        Self { id, name, email, phone: None, password, balance: 0 }
     }
 }
 
@@ -74,12 +76,24 @@ impl UpdatePhone {
 #[derive(AsChangeset)]
 #[diesel(table_name = Users)]
 pub struct UpdatePassword {
-    password: String,
+    password: String
 }
 
 impl UpdatePassword {
     pub fn new(password: String) -> Self {
         Self { password }
+    }
+}
+
+#[derive(AsChangeset)]
+#[diesel(table_name = Users)]
+pub struct UpdateBalance {
+    balance: i32
+}
+
+impl UpdateBalance {
+    pub fn new(balance: i32) -> Self {
+        Self { balance }
     }
 }
 
@@ -141,6 +155,17 @@ impl GetId {
     pub fn new(id: String) -> Self {
         Self { id }
     }
+}
+
+#[derive(Queryable, Identifiable)]
+#[diesel(table_name = Users)]
+pub struct GetUser {
+    pub id: String,
+    pub name: String,
+    pub email: String,
+    pub phone: Option<String>,
+    pub password: String,
+    pub balance: i32
 }
 
 
