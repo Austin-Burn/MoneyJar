@@ -14,7 +14,6 @@ pub fn user_routes() -> Router<AppState> {
         .route("/GetEmail", post(post_get_email))
         .route("/GetPhone", post(post_get_phone))
         .route("/DeleteUser", post(post_delete_user))
-        .route("/Login", post(post_login))
         .route("/UserGetAll", post(post_get_all))
 }
 
@@ -244,20 +243,5 @@ async fn post_delete_user(
     match response {
         Err(_) => StatusCode::NOT_FOUND,
         Ok(_) => StatusCode::OK,
-    }
-}
-
-async fn post_login(
-    State(state): State<AppState>,
-    Json(payload): Json<LoginRequest>,
-) -> (StatusCode, Json<LoginResponse>) {
-    let mut conn = state.pool.get().unwrap();
-    let response = get_id(&mut conn, payload.email, payload.password);
-    match response {
-        Err(_) => (
-            StatusCode::NOT_FOUND,
-            Json(LoginResponse { id: "".to_string() }),
-        ),
-        Ok(id) => (StatusCode::OK, Json(LoginResponse { id: id })),
     }
 }

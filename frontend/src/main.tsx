@@ -7,6 +7,7 @@ import {routeTree} from "./routeTree.gen";
 
 import "./styles.css";
 import "./styles/default.sass";
+import {authenticationContext, AuthenticationProvider,} from "@/AuthenticationContext.tsx";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import reportWebVitals from "./reportWebVitals.ts";
 
@@ -17,6 +18,7 @@ const router = createRouter({
 	routeTree,
 	context: {
 		queryClient,
+		auth: authenticationContext,
 	},
 	defaultPreload: "intent",
 	scrollRestoration: true,
@@ -35,9 +37,11 @@ declare module "@tanstack/react-router" {
 const root = ReactDOM.createRoot(document.body);
 root.render(
 	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<RouterProvider router={router} />
-		</QueryClientProvider>
+		<AuthenticationProvider>
+			<QueryClientProvider client={queryClient}>
+				<RouterProvider router={router} />
+			</QueryClientProvider>
+		</AuthenticationProvider>
 	</StrictMode>,
 );
 

@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as LoginImport } from './routes/login'
 import { Route as GroupsRouteImport } from './routes/groups/route'
 import { Route as FriendsRouteImport } from './routes/friends/route'
 import { Route as EventsRouteImport } from './routes/events/route'
@@ -18,6 +19,12 @@ import { Route as AccountRouteImport } from './routes/account/route'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const LoginRoute = LoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const GroupsRouteRoute = GroupsRouteImport.update({
   id: '/groups',
@@ -88,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GroupsRouteImport
       parentRoute: typeof rootRoute
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -99,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRouteRoute
   '/friends': typeof FriendsRouteRoute
   '/groups': typeof GroupsRouteRoute
+  '/login': typeof LoginRoute
 }
 
 export interface FileRoutesByTo {
@@ -107,6 +122,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRouteRoute
   '/friends': typeof FriendsRouteRoute
   '/groups': typeof GroupsRouteRoute
+  '/login': typeof LoginRoute
 }
 
 export interface FileRoutesById {
@@ -116,14 +132,22 @@ export interface FileRoutesById {
   '/events': typeof EventsRouteRoute
   '/friends': typeof FriendsRouteRoute
   '/groups': typeof GroupsRouteRoute
+  '/login': typeof LoginRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/account' | '/events' | '/friends' | '/groups'
+  fullPaths: '/' | '/account' | '/events' | '/friends' | '/groups' | '/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account' | '/events' | '/friends' | '/groups'
-  id: '__root__' | '/' | '/account' | '/events' | '/friends' | '/groups'
+  to: '/' | '/account' | '/events' | '/friends' | '/groups' | '/login'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/events'
+    | '/friends'
+    | '/groups'
+    | '/login'
   fileRoutesById: FileRoutesById
 }
 
@@ -133,6 +157,7 @@ export interface RootRouteChildren {
   EventsRouteRoute: typeof EventsRouteRoute
   FriendsRouteRoute: typeof FriendsRouteRoute
   GroupsRouteRoute: typeof GroupsRouteRoute
+  LoginRoute: typeof LoginRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -141,6 +166,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRouteRoute: EventsRouteRoute,
   FriendsRouteRoute: FriendsRouteRoute,
   GroupsRouteRoute: GroupsRouteRoute,
+  LoginRoute: LoginRoute,
 }
 
 export const routeTree = rootRoute
@@ -157,7 +183,8 @@ export const routeTree = rootRoute
         "/account",
         "/events",
         "/friends",
-        "/groups"
+        "/groups",
+        "/login"
       ]
     },
     "/": {
@@ -174,6 +201,9 @@ export const routeTree = rootRoute
     },
     "/groups": {
       "filePath": "groups/route.tsx"
+    },
+    "/login": {
+      "filePath": "login.tsx"
     }
   }
 }

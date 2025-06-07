@@ -1,6 +1,14 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    Auth (user_id) {
+        user_id -> Text,
+        token -> Text,
+        expiry -> Text,
+    }
+}
+
+diesel::table! {
     Events (id) {
         id -> Text,
         owner_id -> Text,
@@ -57,6 +65,7 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(Auth -> Users (user_id));
 diesel::joinable!(Events -> Users (owner_id));
 diesel::joinable!(Transactions -> Events (event_id));
 diesel::joinable!(UserPaymentMethods -> Users (user_id));
@@ -64,6 +73,7 @@ diesel::joinable!(WhoInWhat -> Events (event_id));
 diesel::joinable!(WhoInWhat -> Users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    Auth,
     Events,
     Friends,
     Transactions,

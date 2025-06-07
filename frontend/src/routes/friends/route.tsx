@@ -1,16 +1,15 @@
-import { PageContainer } from "@/components/PageContainer.tsx";
-import {
-	mdiAccountPlus,
-	mdiCashFast,
-	mdiDotsVertical,
-	mdiMagnify,
-	mdiQrcode,
-} from "@mdi/js";
+import {PageContainer} from "@/components/PageContainer.tsx";
+import {mdiAccountPlus, mdiCashFast, mdiDotsVertical, mdiMagnify, mdiQrcode,} from "@mdi/js";
 import Icon from "@mdi/react";
-import { createFileRoute } from "@tanstack/react-router";
+import {createFileRoute} from "@tanstack/react-router";
 
 export const Route = createFileRoute("/friends")({
 	component: RouteComponent,
+	beforeLoad: ({ context }) => {
+		if (!context.auth.isAuthenticated) {
+			console.log("Not authenticated");
+		}
+	},
 });
 
 const Users = [

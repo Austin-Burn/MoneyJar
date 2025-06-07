@@ -1,3 +1,4 @@
+pub mod authentication;
 pub mod events;
 pub mod friends;
 pub mod transactions;
@@ -14,4 +15,5 @@ pub fn all_routes() -> Router<AppState> {
         .nest("/api", events::event_routes())
         .nest("/api", who_in_what::who_in_what_routes())
         .nest("/api", transactions::transaction_routes())
+        .nest("/api", authentication::auth_routes())
 }

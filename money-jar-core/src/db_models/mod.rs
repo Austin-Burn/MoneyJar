@@ -1,13 +1,15 @@
 #![allow(non_snake_case)]
-pub mod users;
-pub mod friends;
+pub mod auth;
 pub mod events;
-pub mod whoInWhat;
+pub mod friends;
 pub mod transactions;
+pub mod users;
+pub mod whoInWhat;
 
 // Re-export all submodules
-pub use users::*;
-pub use friends::*;
+pub use auth::*;
 pub use events::*;
-pub use whoInWhat::*;
+pub use friends::*;
 pub use transactions::*;
+pub use users::*;
+pub use whoInWhat::*;

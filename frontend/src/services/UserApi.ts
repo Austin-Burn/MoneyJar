@@ -4,13 +4,12 @@ import {
 	GetEmailRequest,
 	GetNameRequest,
 	GetUserInfoRequest,
-	LoginRequest,
 	UpdateEmailRequest,
 	UpdateNameRequest,
 	UpdatePhoneRequest,
 } from "@/schema/api/user.ts";
 import {createApiRequestFunction} from "@/util.ts";
-import {HttpClient,} from "@effect/platform";
+import {HttpClient} from "@effect/platform";
 import {Effect} from "effect";
 
 /**
@@ -49,9 +48,6 @@ export class UserApi extends Effect.Service<UserApi>()("UserApi", {
 
 			deleteUser: (id: string) =>
 				apiRequest("/DeleteUser", { id }, DeleteUserRequest),
-
-			login: (email: string, password: string) =>
-				apiRequest("/Login", { email, password }, LoginRequest),
 		};
 	}),
 }) {}
