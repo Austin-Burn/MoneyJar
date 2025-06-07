@@ -11,9 +11,44 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as LoginImport } from './routes/login'
+import { Route as GroupsRouteImport } from './routes/groups/route'
+import { Route as FriendsRouteImport } from './routes/friends/route'
+import { Route as EventsRouteImport } from './routes/events/route'
+import { Route as AccountRouteImport } from './routes/account/route'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const LoginRoute = LoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GroupsRouteRoute = GroupsRouteImport.update({
+  id: '/groups',
+  path: '/groups',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const FriendsRouteRoute = FriendsRouteImport.update({
+  id: '/friends',
+  path: '/friends',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const EventsRouteRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AccountRouteRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -32,6 +67,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/friends': {
+      id: '/friends'
+      path: '/friends'
+      fullPath: '/friends'
+      preLoaderRoute: typeof FriendsRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/groups': {
+      id: '/groups'
+      path: '/groups'
+      fullPath: '/groups'
+      preLoaderRoute: typeof GroupsRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -39,32 +109,64 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRouteRoute
+  '/events': typeof EventsRouteRoute
+  '/friends': typeof FriendsRouteRoute
+  '/groups': typeof GroupsRouteRoute
+  '/login': typeof LoginRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRouteRoute
+  '/events': typeof EventsRouteRoute
+  '/friends': typeof FriendsRouteRoute
+  '/groups': typeof GroupsRouteRoute
+  '/login': typeof LoginRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/account': typeof AccountRouteRoute
+  '/events': typeof EventsRouteRoute
+  '/friends': typeof FriendsRouteRoute
+  '/groups': typeof GroupsRouteRoute
+  '/login': typeof LoginRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/account' | '/events' | '/friends' | '/groups' | '/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/account' | '/events' | '/friends' | '/groups' | '/login'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/events'
+    | '/friends'
+    | '/groups'
+    | '/login'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRouteRoute: typeof AccountRouteRoute
+  EventsRouteRoute: typeof EventsRouteRoute
+  FriendsRouteRoute: typeof FriendsRouteRoute
+  GroupsRouteRoute: typeof GroupsRouteRoute
+  LoginRoute: typeof LoginRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRouteRoute: AccountRouteRoute,
+  EventsRouteRoute: EventsRouteRoute,
+  FriendsRouteRoute: FriendsRouteRoute,
+  GroupsRouteRoute: GroupsRouteRoute,
+  LoginRoute: LoginRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +179,31 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/account",
+        "/events",
+        "/friends",
+        "/groups",
+        "/login"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/account": {
+      "filePath": "account/route.tsx"
+    },
+    "/events": {
+      "filePath": "events/route.tsx"
+    },
+    "/friends": {
+      "filePath": "friends/route.tsx"
+    },
+    "/groups": {
+      "filePath": "groups/route.tsx"
+    },
+    "/login": {
+      "filePath": "login.tsx"
     }
   }
 }

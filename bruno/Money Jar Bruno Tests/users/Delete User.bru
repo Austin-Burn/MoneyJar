@@ -1,0 +1,17 @@
+meta {
+  name: Delete User
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:2000/api/DeleteUser
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "user_id_here"
+  }
+} 

@@ -1,0 +1,18 @@
+meta {
+  name: Update Date
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:2000/api/UpdateDate
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "event_id_here",
+    "date": "2024-03-20"
+  }
+} 

@@ -1,0 +1,54 @@
+meta {
+  name: Create Event
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:2000/api/CreateEvent
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "owner_id": "{{user_id}}",
+    "name": "Test Event",
+    "reoccuring": false
+  }
+}
+
+docs {
+  # Create Event Test
+
+  This test verifies that:
+  1. An event can be created successfully
+  2. The owner is automatically added to the who_in_what table
+
+  ## Prerequisites:
+  - A valid user ID must be set in the environment variable 'user_id'
+  - The user must exist in the database
+
+  ## Test Steps:
+  1. Create a new event
+  2. Verify the response is 200 OK and contains an event ID
+  3. Use Get Users From Event to verify the owner is in the event
+}
+
+test:script {
+  // Verify the response is successful
+  expect(response.status).to.equal(200);
+  expect(response.body.id).to.be.a('string');
+  expect(response.body.id).to.not.be.empty;
+
+  // Make a request to get users from the event
+  const getUsersResponse = await bruno.run('Get Users From Event', {
+    body: {
+      event_id: response.body.id
+    }
+  });
+
+  // Verify the owner is in the list of users
+  expect(getUsersResponse.status).to.equal(200);
+  expect(getUsersResponse.body.users).to.include(process.env.user_id);
+} 

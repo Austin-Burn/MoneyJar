@@ -1,53 +1,16 @@
-import {createFileRoute} from "@tanstack/react-router";
-import logo from "../logo.svg";
-import {useEffect} from "react";
+import { PageContainer } from "@/components/PageContainer.tsx";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-    component: App,
+	component: App,
 });
 
 function App() {
-    useEffect(() => {
-        fetch("/api/hello", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({name: "World"}),
-        })
-            .then((res) => res.json())
-            .then((data) => console.log(data));
-    }, []);
-
-    return (
-        <div className="text-center">
-            <header
-                className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-                <img
-                    src={logo}
-                    className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-                    alt="logo"
-                />
-                <p>
-                    Edit <code>src/routes/index.tsx</code> and save to reload.
-                </p>
-                <a
-                    className="text-[#61dafb] hover:underline"
-                    href="https://reactjs.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Learn React
-                </a>
-                <a
-                    className="text-[#61dafb] hover:underline"
-                    href="https://tanstack.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Learn TanStack
-                </a>
-            </header>
-        </div>
-    );
+	return (
+		<PageContainer>
+			<div className={"flex flex-row items-center justify-between"}>
+				<h1 className={"text-4xl"}>Index</h1>
+			</div>
+		</PageContainer>
+	);
 }
