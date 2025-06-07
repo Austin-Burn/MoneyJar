@@ -16,7 +16,10 @@ pub fn create_user(conn: &mut SqliteConnection, new_name: String, new_email: Str
         .get_result::<bool>(conn)?;
 
     if email_exists {
-        return Err(ModelError::BusinessRule("User already exists".to_string()));
+        return Err(ModelError::Database(diesel::result::Error::DatabaseError(
+            DatabaseErrorKind::UniqueViolation,
+            Box::new("User already exists".to_string())
+        )));
     }
 
     insert_into(Users)
@@ -61,11 +64,21 @@ pub fn update_password(conn: &mut SqliteConnection, get_id: String, update_passw
     Ok(())
 }
 
-pub fn get_all(conn: &mut SqliteConnection, user_id: String) -> Result<(String, String, Option<String>), ModelError> {
+pub fn update_balance(conn: &mut SqliteConnection, get_id: String, new_balance: i32) -> Result<(), ModelError> {
+    let update_balance = UpdateBalance::new(new_balance);
+    update(Users)
+        .filter(id.eq(get_id))
+        .set(update_balance)
+        .execute(conn)?;
+
+    Ok(())
+}
+
+pub fn get_all(conn: &mut SqliteConnection, user_id: String) -> Result<(String, String, Option<String>, i32), ModelError> {
     let result = Users
         .filter(id.eq(user_id))
-        .select((name, email, phone))
-        .first::<(String, String, Option<String>)>(conn)?;
+        .select((name, email, phone, balance))
+        .first::<(String, String, Option<String>, i32)>(conn)?;
 
     Ok(result)
 }
@@ -94,6 +107,14 @@ pub fn get_phone(conn: &mut SqliteConnection, get_id: String) -> Result<Option<S
         .select(phone)
         .first::<Option<String>>(conn)?;
     Ok(phone_exists)
+}
+
+pub fn get_balance(conn: &mut SqliteConnection, get_id: String) -> Result<i32, ModelError> {
+    let user_balance = Users
+        .filter(id.eq(get_id))
+        .select(balance)
+        .first::<i32>(conn)?;
+    Ok(user_balance)
 }
 
 pub fn get_id(conn: &mut SqliteConnection, get_email: String, get_password: String) -> Result<String, ModelError> {
